@@ -1,0 +1,450 @@
+{
+  "users": [
+    {
+      "id": "USR001",
+      "name": "Alisher Karimov",
+      "initials": "AK",
+      "phone": "+998 90 123 45 67",
+      "email": "alisher@example.com",
+      "tariff": "Premium",
+      "status": "Faol",
+      "balance": 450.25,
+      "registrationDate": "2023-12-28"
+    },
+    {
+      "id": "USR002",
+      "name": "Dilshod Rakhimov",
+      "initials": "DR",
+      "phone": "+998 91 234 56 78",
+      "email": "dilshod@example.com",
+      "tariff": "Standard",
+      "status": "Faol",
+      "balance": 120.5,
+      "registrationDate": "2023-12-29"
+    },
+    {
+      "id": "USR003",
+      "name": "Nodira Azizova",
+      "initials": "NA",
+      "phone": "+998 99 345 67 89",
+      "email": "nodira@example.com",
+      "tariff": "Basic",
+      "status": "Faol",
+      "balance": 75.0,
+      "registrationDate": "2023-12-30"
+    },
+    {
+      "id": "USR004",
+      "name": "Bekzod Tursunov",
+      "initials": "BT",
+      "phone": "+998 93 456 78 90",
+      "email": "bekzod@example.com",
+      "tariff": "Premium",
+      "status": "Faol",
+      "balance": 320.75,
+      "registrationDate": "2023-12-31"
+    },
+    {
+      "id": "USR005",
+      "name": "Malika Umarova",
+      "initials": "MU",
+      "phone": "+998 94 567 89 01",
+      "email": "malika@example.com",
+      "tariff": "Standard",
+      "status": "Faol",
+      "balance": 180.25,
+      "registrationDate": "2024-01-01"
+    },
+    {
+      "id": "USR006",
+      "name": "Jasur Toshmatov",
+      "initials": "JT",
+      "phone": "+998 95 678 90 12",
+      "email": "jasur@example.com",
+      "tariff": "Premium",
+      "status": "Nofaol",
+      "balance": 0.0,
+      "registrationDate": "2024-01-02"
+    },
+    {
+      "id": "USR007",
+      "name": "Gulnora Karimova",
+      "initials": "GK",
+      "phone": "+998 97 789 01 23",
+      "email": "gulnora@example.com",
+      "tariff": "Basic",
+      "status": "Faol",
+      "balance": 45.5,
+      "registrationDate": "2024-01-03"
+    },
+    {
+      "id": "USR008",
+      "name": "Otabek Mirzayev",
+      "initials": "OM",
+      "phone": "+998 98 890 12 34",
+      "email": "otabek@example.com",
+      "tariff": "Standard",
+      "status": "Faol",
+      "balance": 150.0,
+      "registrationDate": "2024-01-04"
+    },
+    {
+      "id": "USR009",
+      "name": "Zarina Alimova",
+      "initials": "ZA",
+      "phone": "+998 99 901 23 45",
+      "email": "zarina@example.com",
+      "tariff": "Basic",
+      "status": "Nofaol",
+      "balance": 0.0,
+      "registrationDate": "2024-01-05"
+    }
+  ],
+  "payments": [
+    {
+      "id": "PAY001",
+      "userId": "USR001",
+      "user": {
+        "name": "Alisher Karimov",
+        "initials": "AK"
+      },
+      "amount": 99.99,
+      "status": "To'langan",
+      "date": "2024-01-15"
+    },
+    {
+      "id": "PAY002",
+      "userId": "USR002",
+      "user": {
+        "name": "Dilshod Rakhimov",
+        "initials": "DR"
+      },
+      "amount": 49.99,
+      "status": "To'langan",
+      "date": "2024-01-14"
+    },
+    {
+      "id": "PAY003",
+      "userId": "USR003",
+      "user": {
+        "name": "Nodira Azizova",
+        "initials": "NA"
+      },
+      "amount": 29.99,
+      "status": "To'langan",
+      "date": "2024-01-13"
+    },
+    {
+      "id": "PAY004",
+      "userId": "USR004",
+      "user": {
+        "name": "Bekzod Tursunov",
+        "initials": "BT"
+      },
+      "amount": 99.99,
+      "status": "To'langan",
+      "date": "2024-01-12"
+    },
+    {
+      "id": "PAY005",
+      "userId": "USR005",
+      "user": {
+        "name": "Malika Umarova",
+        "initials": "MU"
+      },
+      "amount": 49.99,
+      "status": "To'langan",
+      "date": "2024-01-11"
+    }
+  ],
+  "withdrawals": [
+    {
+      "id": "WDR001",
+      "userId": "USR001",
+      "user": {
+        "name": "Alisher Karimov",
+        "initials": "AK"
+      },
+      "amount": 120.0,
+      "cardNumber": "**** **** **** 1234",
+      "status": "Kutilmoqda",
+      "date": "2024-01-15"
+    },
+    {
+      "id": "WDR002",
+      "userId": "USR002",
+      "user": {
+        "name": "Dilshod Rakhimov",
+        "initials": "DR"
+      },
+      "amount": 75.5,
+      "cardNumber": "**** **** **** 5678",
+      "status": "To'langan",
+      "date": "2024-01-14"
+    },
+    {
+      "id": "WDR003",
+      "userId": "USR003",
+      "user": {
+        "name": "Nodira Azizova",
+        "initials": "NA"
+      },
+      "amount": 45.25,
+      "cardNumber": "**** **** **** 9012",
+      "status": "Kutilmoqda",
+      "date": "2024-01-13"
+    },
+    {
+      "id": "WDR004",
+      "userId": "USR004",
+      "user": {
+        "name": "Bekzod Tursunov",
+        "initials": "BT"
+      },
+      "amount": 200.0,
+      "cardNumber": "**** **** **** 3456",
+      "status": "To'langan",
+      "date": "2024-01-12"
+    },
+    {
+      "id": "WDR005",
+      "userId": "USR005",
+      "user": {
+        "name": "Malika Umarova",
+        "initials": "MU"
+      },
+      "amount": 150.75,
+      "cardNumber": "**** **** **** 7890",
+      "status": "Kutilmoqda",
+      "date": "2024-01-11"
+    },
+    {
+      "id": "WDR006",
+      "userId": "USR006",
+      "user": {
+        "name": "Rustam Khasanov",
+        "initials": "RK"
+      },
+      "amount": 320.5,
+      "cardNumber": "**** **** **** 2345",
+      "status": "To'langan",
+      "date": "2024-01-10"
+    },
+    {
+      "id": "WDR007",
+      "userId": "USR007",
+      "user": {
+        "name": "Gulnora Karimova",
+        "initials": "GK"
+      },
+      "amount": 35.25,
+      "cardNumber": "**** **** **** 6789",
+      "status": "Rad etilgan",
+      "date": "2024-01-09"
+    }
+  ],
+  "tariffs": [
+    {
+      "id": "TARIFF001",
+      "name": "Basic",
+      "price": 9.99,
+      "description": "Asosiy funksiyalar bilan tarif",
+      "features": ["Asosiy funksiyalar", "Cheklangan qo'llab-quvvatlash", "1 GB saqlash"],
+      "status": "Faol"
+    },
+    {
+      "id": "TARIFF002",
+      "name": "Standard",
+      "price": 19.99,
+      "description": "Ko'proq funksiyalar bilan tarif",
+      "features": ["Barcha asosiy funksiyalar", "24/7 qo'llab-quvvatlash", "10 GB saqlash", "Statistika"],
+      "status": "Faol"
+    },
+    {
+      "id": "TARIFF003",
+      "name": "Premium",
+      "price": 49.99,
+      "description": "Barcha funksiyalar bilan tarif",
+      "features": ["Barcha funksiyalar", "24/7 premium qo'llab-quvvatlash", "Cheksiz saqlash", "Statistika", "API"],
+      "status": "Faol"
+    },
+    {
+      "id": "TARIFF004",
+      "name": "Enterprise",
+      "price": 99.99,
+      "description": "Katta biznes uchun tarif",
+      "features": [
+        "Barcha funksiyalar",
+        "Shaxsiy menejer",
+        "Cheksiz saqlash",
+        "Statistika",
+        "API",
+        "Maxsus funksiyalar"
+      ],
+      "status": "Nofaol"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "NOT001",
+      "title": "Yangi tarif qo'shildi",
+      "message": "Platformaga yangi 'Premium+' tarifi qo'shildi. Ko'proq ma'lumot uchun tariflar bo'limiga o'ting.",
+      "recipient": "Barcha foydalanuvchilar",
+      "date": "2024-01-15",
+      "status": "Yuborilgan"
+    },
+    {
+      "id": "NOT002",
+      "title": "Texnik ishlar",
+      "message": "Hurmatli foydalanuvchilar, 20-yanvar kuni soat 02:00 dan 04:00 gacha texnik ishlar olib boriladi.",
+      "recipient": "Barcha foydalanuvchilar",
+      "date": "2024-01-14",
+      "status": "Yuborilgan"
+    },
+    {
+      "id": "NOT003",
+      "title": "Tarifingiz muddati tugamoqda",
+      "message": "Hurmatli mijoz, sizning Premium tarifingiz 3 kundan so'ng tugaydi. Iltimos, tarifni yangilang.",
+      "recipient": "Premium foydalanuvchilar",
+      "date": "2024-01-13",
+      "status": "Yuborilgan"
+    },
+    {
+      "id": "NOT004",
+      "title": "Yangi funksiyalar",
+      "message": "Platformaga yangi funksiyalar qo'shildi. Batafsil ma'lumot uchun yangiliklar bo'limiga o'ting.",
+      "recipient": "Barcha foydalanuvchilar",
+      "date": "2024-01-12",
+      "status": "Yuborilgan"
+    },
+    {
+      "id": "NOT005",
+      "title": "Bayram bilan tabriklaymiz",
+      "message": "Hurmatli mijozlar, sizni Yangi yil bilan tabriklaymiz! Bayram munosabati bilan barcha tariflarga 20% chegirma.",
+      "recipient": "Barcha foydalanuvchilar",
+      "date": "2024-01-01",
+      "status": "Yuborilgan"
+    }
+  ],
+  "statistics": {
+    "userStats": {
+      "total": 2350,
+      "active": 2100,
+      "inactive": 250,
+      "growth": 12.5
+    },
+    "revenueStats": {
+      "total": 45231.89,
+      "monthly": 8750.25,
+      "growth": 8.2
+    },
+    "tariffStats": {
+      "total": 1234,
+      "premium": 540,
+      "standard": 620,
+      "basic": 1190,
+      "growth": 5.1
+    },
+    "withdrawalStats": {
+      "pending": 23,
+      "processed": 156,
+      "rejected": 12,
+      "growth": -3.2
+    },
+    "monthlyRevenue": [
+      {
+        "name": "1-Yan",
+        "total": 900
+      },
+      {
+        "name": "5-Yan",
+        "total": 1800
+      },
+      {
+        "name": "10-Yan",
+        "total": 1500
+      },
+      {
+        "name": "15-Yan",
+        "total": 2700
+      },
+      {
+        "name": "20-Yan",
+        "total": 2300
+      },
+      {
+        "name": "25-Yan",
+        "total": 3300
+      },
+      {
+        "name": "30-Yan",
+        "total": 2900
+      }
+    ],
+    "userActivity": [
+      {
+        "date": "2024-01-01",
+        "logins": 120,
+        "transactions": 45
+      },
+      {
+        "date": "2024-01-02",
+        "logins": 145,
+        "transactions": 52
+      },
+      {
+        "date": "2024-01-03",
+        "logins": 132,
+        "transactions": 48
+      },
+      {
+        "date": "2024-01-04",
+        "logins": 160,
+        "transactions": 65
+      },
+      {
+        "date": "2024-01-05",
+        "logins": 175,
+        "transactions": 72
+      },
+      {
+        "date": "2024-01-06",
+        "logins": 190,
+        "transactions": 80
+      },
+      {
+        "date": "2024-01-07",
+        "logins": 210,
+        "transactions": 95
+      }
+    ]
+  },
+  "settings": {
+    "general": {
+      "siteName": "Tarmoqli Marketing",
+      "siteDescription": "Tarmoqli Marketing Admin Panel",
+      "contactEmail": "admin@tarmoqli.com",
+      "supportPhone": "+998 90 123 45 67"
+    },
+    "appearance": {
+      "theme": "dark",
+      "language": "uz",
+      "dateFormat": "DD-MM-YYYY"
+    },
+    "notifications": {
+      "emailNotifications": true,
+      "smsNotifications": true,
+      "pushNotifications": false
+    },
+    "security": {
+      "twoFactorAuth": true,
+      "sessionTimeout": 30,
+      "passwordPolicy": {
+        "minLength": 8,
+        "requireUppercase": true,
+        "requireNumbers": true,
+        "requireSpecialChars": true
+      }
+    }
+  }
+}
