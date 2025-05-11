@@ -1,30 +1,41 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { UsersTable } from "@/components/users/users-table"
-import { Download, Plus } from "lucide-react"
-import { useLanguage } from "@/contexts/language-context"
-import { useUsers } from "@/hooks/use-users"
-import { exportToPDF } from "@/lib/pdf-export"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { toast } from "@/components/ui/use-toast"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { UsersTable } from "@/components/users/users-table";
+import { Download, Plus } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
+import { useUsers } from "@/hooks/use-users";
+import { exportToPDF } from "@/lib/pdf-export";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { toast } from "@/components/ui/use-toast";
 
 export default function UsersPage() {
-  const { t } = useLanguage()
-  const { data: users, isLoading } = useUsers()
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const { t } = useLanguage();
+  const { data: users, isLoading } = useUsers();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newUser, setNewUser] = useState({
     name: "",
     phone: "",
     email: "",
     tariff: "Basic",
-  })
+  });
 
   const handleExportPDF = () => {
     const columns = [
@@ -36,20 +47,20 @@ export default function UsersPage() {
       { header: t("status"), accessor: "status" },
       { header: t("balance"), accessor: "balance" },
       { header: t("registrationDate"), accessor: "registrationDate" },
-    ]
+    ];
 
-    exportToPDF(users, columns, t("users"), "users-export")
-  }
+    exportToPDF(users, columns, t("users"), "users-export");
+  };
 
   const handleAddUser = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // In a real app, this would call an API to add the user
     toast({
       title: t("success"),
       description: t("userAdded"),
-    })
-    setIsAddDialogOpen(false)
-  }
+    });
+    setIsAddDialogOpen(false);
+  };
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -64,12 +75,18 @@ export default function UsersPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleExportPDF}>{t("downloadPDF")}</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportPDF}>
+                {t("downloadPDF")}
+              </DropdownMenuItem>
               <DropdownMenuItem>{t("downloadCSV")}</DropdownMenuItem>
               <DropdownMenuItem>{t("downloadExcel")}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button size="sm" className="bg-button-bg hover:bg-button-hover" onClick={() => setIsAddDialogOpen(true)}>
+          <Button
+            size="sm"
+            className="bg-button-bg hover:bg-button-hover"
+            onClick={() => setIsAddDialogOpen(true)}
+          >
             <Plus className="mr-2 h-4 w-4" />
             {t("add")}
           </Button>
@@ -93,7 +110,7 @@ export default function UsersPage() {
           </DialogHeader>
           <form onSubmit={handleAddUser}>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
+              {/* <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">
                   {t("name")}
                 </Label>
@@ -104,7 +121,7 @@ export default function UsersPage() {
                   className="col-span-3"
                   required
                 />
-              </div>
+              </div> */}
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="phone" className="text-right">
                   {t("phone")}
@@ -112,7 +129,9 @@ export default function UsersPage() {
                 <Input
                   id="phone"
                   value={newUser.phone}
-                  onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, phone: e.target.value })
+                  }
                   className="col-span-3"
                   required
                 />
@@ -125,7 +144,9 @@ export default function UsersPage() {
                   id="email"
                   type="email"
                   value={newUser.email}
-                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, email: e.target.value })
+                  }
                   className="col-span-3"
                   required
                 />
@@ -138,5 +159,5 @@ export default function UsersPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
