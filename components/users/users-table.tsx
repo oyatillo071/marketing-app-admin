@@ -88,9 +88,12 @@ export function UsersTable({ searchTerm = "" }) {
         filtered = filtered.filter((item) => item.tariff === tariffFilter);
       }
 
-      setFilteredData(filtered); // Обновляем состояние без проверки
+      // Only update filtered data if it has actually changed
+      if (JSON.stringify(filtered) !== JSON.stringify(filteredData)) {
+        setFilteredData(filtered);
+      }
     }
-  }, [users, localSearchTerm, statusFilter, tariffFilter]);
+  }, [users, localSearchTerm, statusFilter, tariffFilter, filteredData]);
 
   const columns: ColumnDef<any>[] = [
     {
@@ -290,12 +293,12 @@ export function UsersTable({ searchTerm = "" }) {
             className="w-full"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 grid-rows-2  items-center justify-around gap-4">
           <Select
             value={statusFilter || ""}
             onValueChange={(value) => setStatusFilter(value || null)}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="">
               <SelectValue placeholder={t("filterByStatus")} />
             </SelectTrigger>
             <SelectContent>
@@ -308,7 +311,7 @@ export function UsersTable({ searchTerm = "" }) {
             value={tariffFilter || ""}
             onValueChange={(value) => setTariffFilter(value || null)}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="max-w-[180px]">
               <SelectValue placeholder={t("filterByTarif")} />
             </SelectTrigger>
             <SelectContent>
@@ -320,10 +323,11 @@ export function UsersTable({ searchTerm = "" }) {
           </Select>
           <Button
             variant="outline"
+            className="w-full p-2 text-xs gap-0"
             onClick={clearFilters}
             disabled={!localSearchTerm && !statusFilter && !tariffFilter}
           >
-            <X className="mr-2 h-4 w-4" />
+            <X className="mr-2 h-4 w-4 " />
             {t("clearFilters")}
           </Button>
         </div>
@@ -357,7 +361,7 @@ export function UsersTable({ searchTerm = "" }) {
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="whitespace-nowrap">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

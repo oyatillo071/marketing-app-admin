@@ -48,7 +48,7 @@ const SidebarLink = memo(
         onClick={onLinkClick}
         className={cn(
           "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-          pathname === item.href || pathname.startsWith(`${item.href}/`)
+          pathname === item.href
             ? "bg-secondary-bg text-white"
             : "text-muted-foreground hover:bg-secondary-bg hover:text-white"
         )}
@@ -150,7 +150,7 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile menu toggle button - only visible on small screens */}
-      <div className="lg:hidden fixed top-3 left-4 z-50">
+      <div className="lg:hidden  fixed top-3 left-4 z-50">
         <Button
           size="icon"
           variant="outline"
@@ -176,7 +176,7 @@ export function Sidebar() {
       {/* Responsive sidebar using media classes only */}
       <div
         className={cn(
-          "h-screen bg-dark-bg border-r border-border flex flex-col fixed z-40 transition-all duration-300 ease-in-out",
+          "h-screen dark:bg-dark-bg bg-inherit border-r border-border flex flex-col fixed z-40 transition-all duration-300 ease-in-out",
           "w-full sm:w-80 md:w-72 lg:w-64 xl:w-72",
           isMobileMenuOpen ? "left-0" : "-left-full lg:left-0"
         )}

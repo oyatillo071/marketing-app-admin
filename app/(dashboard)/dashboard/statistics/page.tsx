@@ -69,8 +69,8 @@ export default function StatisticsPage() {
   }
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center justify-between">
+    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 pr-2">
+      <div className="grid grid-rows-2 gap-4 items-center justify-between ">
         <h2 className="text-3xl font-bold tracking-tight">{t("statistics")}</h2>
         <Button variant="outline" size="sm" onClick={handleExport}>
           <Download className="mr-2 h-4 w-4" />
@@ -78,14 +78,16 @@ export default function StatisticsPage() {
         </Button>
       </div>
       <Tabs defaultValue="umumiy" className="space-y-4">
-        <TabsList>
+        <TabsList className="grid grid-rows-2 grid-cols-2 gap-2 h-24 p-2 text-left items-center justify-between ">
           <TabsTrigger value="umumiy">{t("overview")}</TabsTrigger>
-          <TabsTrigger value="foydalanuvchilar">{t("users")}</TabsTrigger>
           <TabsTrigger value="tolovlar">{t("payments")}</TabsTrigger>
-          <TabsTrigger value="yechib_olishlar">{t("withdrawals")}</TabsTrigger>
+          <TabsTrigger value="foydalanuvchilar">{t("users")}</TabsTrigger>
+          <TabsTrigger value="yechib_olishlar" className="px-2">
+            {t("withdrawals")}
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="umumiy" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
@@ -160,8 +162,8 @@ export default function StatisticsPage() {
               </CardContent>
             </Card>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
+          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
+            <Card className="col-span-1 lg:col-span-4">
               <CardHeader>
                 <CardTitle>{t("revenueStatistics")}</CardTitle>
               </CardHeader>
@@ -169,7 +171,7 @@ export default function StatisticsPage() {
                 <RevenueChart data={statistics.monthlyRevenue} />
               </CardContent>
             </Card>
-            <Card className="col-span-3">
+            <Card className="col-span-1 lg:col-span-2">
               <CardHeader>
                 <CardTitle>{t("tariffDistribution")}</CardTitle>
               </CardHeader>
@@ -211,8 +213,10 @@ export default function StatisticsPage() {
         </TabsContent>
         <TabsContent value="tolovlar" className="space-y-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>{t("paymentStatistics")}</CardTitle>
+            <CardHeader className="flex flex-col gap-4 md:text-center  justify-between">
+              <CardTitle className="text-xl text-left">
+                {t("paymentStatistics")}
+              </CardTitle>
               <Button
                 variant="outline"
                 size="sm"
@@ -275,8 +279,10 @@ export default function StatisticsPage() {
         </TabsContent>
         <TabsContent value="yechib_olishlar" className="space-y-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>{t("withdrawalStatistics")}</CardTitle>
+            <CardHeader className="flex flex-col gap-4 md:items-center justify-between">
+              <CardTitle className="whitespace-nowrap text-xl text-left">
+                {t("withdrawalStatistics")}
+              </CardTitle>
               <Button
                 variant="outline"
                 size="sm"
@@ -317,7 +323,9 @@ export default function StatisticsPage() {
                             </div>
                           </TableCell>
                           <TableCell>${withdrawal.amount.toFixed(2)}</TableCell>
-                          <TableCell>{withdrawal.cardNumber}</TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            {withdrawal.cardNumber}
+                          </TableCell>
                           <TableCell>
                             <Badge
                               className={

@@ -1,31 +1,44 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useSettings } from "@/hooks/use-settings"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useLanguage } from "@/contexts/language-context"
-import { useTheme } from "next-themes"
-import { Loader2 } from "lucide-react"
-import { useState } from "react"
+import { useSettings } from "@/hooks/use-settings";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useLanguage } from "@/contexts/language-context";
+import { useTheme } from "next-themes";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 export default function SettingsPage() {
-  const { data: settings, isLoading, updateSettings } = useSettings()
-  const { t, language, setLanguage } = useLanguage()
-  const { theme, setTheme } = useTheme()
-  const [isSaving, setIsSaving] = useState(false)
+  const { data: settings, isLoading, updateSettings } = useSettings();
+  const { t, language, setLanguage } = useLanguage();
+  const { theme, setTheme } = useTheme();
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSaveGeneral = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsSaving(true)
+    e.preventDefault();
+    setIsSaving(true);
 
-    const formData = new FormData(e.currentTarget)
+    const formData = new FormData(e.currentTarget);
     const updatedSettings = {
       ...settings,
       general: {
@@ -34,23 +47,23 @@ export default function SettingsPage() {
         contactEmail: formData.get("contactEmail"),
         supportPhone: formData.get("supportPhone"),
       },
-    }
+    };
 
-    await updateSettings(updatedSettings)
-    setIsSaving(false)
-  }
+    await updateSettings(updatedSettings);
+    setIsSaving(false);
+  };
 
   const handleSaveAppearance = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsSaving(true)
+    e.preventDefault();
+    setIsSaving(true);
 
-    const formData = new FormData(e.currentTarget)
-    const newTheme = formData.get("theme") as string
-    const newLanguage = formData.get("language") as any
-    const dateFormat = formData.get("dateFormat") as string
+    const formData = new FormData(e.currentTarget);
+    const newTheme = formData.get("theme") as string;
+    const newLanguage = formData.get("language") as any;
+    const dateFormat = formData.get("dateFormat") as string;
 
-    setTheme(newTheme)
-    setLanguage(newLanguage)
+    setTheme(newTheme);
+    setLanguage(newLanguage);
 
     const updatedSettings = {
       ...settings,
@@ -59,17 +72,19 @@ export default function SettingsPage() {
         language: newLanguage,
         dateFormat,
       },
-    }
+    };
 
-    await updateSettings(updatedSettings)
-    setIsSaving(false)
-  }
+    await updateSettings(updatedSettings);
+    setIsSaving(false);
+  };
 
-  const handleSaveNotifications = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsSaving(true)
+  const handleSaveNotifications = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    setIsSaving(true);
 
-    const formData = new FormData(e.currentTarget)
+    const formData = new FormData(e.currentTarget);
     const updatedSettings = {
       ...settings,
       notifications: {
@@ -77,17 +92,17 @@ export default function SettingsPage() {
         smsNotifications: formData.get("smsNotifications") === "on",
         pushNotifications: formData.get("pushNotifications") === "on",
       },
-    }
+    };
 
-    await updateSettings(updatedSettings)
-    setIsSaving(false)
-  }
+    await updateSettings(updatedSettings);
+    setIsSaving(false);
+  };
 
   const handleSaveSecurity = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsSaving(true)
+    e.preventDefault();
+    setIsSaving(true);
 
-    const formData = new FormData(e.currentTarget)
+    const formData = new FormData(e.currentTarget);
     const updatedSettings = {
       ...settings,
       security: {
@@ -100,11 +115,11 @@ export default function SettingsPage() {
           requireSpecialChars: formData.get("requireSpecialChars") === "on",
         },
       },
-    }
+    };
 
-    await updateSettings(updatedSettings)
-    setIsSaving(false)
-  }
+    await updateSettings(updatedSettings);
+    setIsSaving(false);
+  };
 
   if (isLoading) {
     return (
@@ -114,7 +129,7 @@ export default function SettingsPage() {
           <p>{t("loading")}</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -124,7 +139,7 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-4">
-        <TabsList>
+        <TabsList className="grid w-full grid-rows-2 md:grid-cols-4 p-4 gap-4 items-center h-24 md:h-11 md:grid-rows-1 grid-cols-2">
           <TabsTrigger value="general">{t("general")}</TabsTrigger>
           <TabsTrigger value="appearance">{t("appearance")}</TabsTrigger>
           <TabsTrigger value="notifications">{t("notifications")}</TabsTrigger>
@@ -141,11 +156,21 @@ export default function SettingsPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="siteName">{t("siteName")}</Label>
-                  <Input id="siteName" name="siteName" defaultValue={settings?.general.siteName} />
+                  <Input
+                    id="siteName"
+                    name="siteName"
+                    defaultValue={settings?.general.siteName}
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="siteDescription">{t("siteDescription")}</Label>
-                  <Input id="siteDescription" name="siteDescription" defaultValue={settings?.general.siteDescription} />
+                  <Label htmlFor="siteDescription">
+                    {t("siteDescription")}
+                  </Label>
+                  <Input
+                    id="siteDescription"
+                    name="siteDescription"
+                    defaultValue={settings?.general.siteDescription}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="contactEmail">{t("contactEmail")}</Label>
@@ -158,12 +183,18 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="supportPhone">{t("supportPhone")}</Label>
-                  <Input id="supportPhone" name="supportPhone" defaultValue={settings?.general.supportPhone} />
+                  <Input
+                    id="supportPhone"
+                    name="supportPhone"
+                    defaultValue={settings?.general.supportPhone}
+                  />
                 </div>
               </CardContent>
               <CardFooter>
                 <Button type="submit" disabled={isSaving}>
-                  {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isSaving && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   {t("save")}
                 </Button>
               </CardFooter>
@@ -210,7 +241,10 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="dateFormat">{t("dateFormat")}</Label>
-                  <Select name="dateFormat" defaultValue={settings?.appearance.dateFormat}>
+                  <Select
+                    name="dateFormat"
+                    defaultValue={settings?.appearance.dateFormat}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder={t("selectDateFormat")} />
                     </SelectTrigger>
@@ -224,7 +258,9 @@ export default function SettingsPage() {
               </CardContent>
               <CardFooter>
                 <Button type="submit" disabled={isSaving}>
-                  {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isSaving && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   {t("save")}
                 </Button>
               </CardFooter>
@@ -241,7 +277,9 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="emailNotifications">{t("emailNotifications")}</Label>
+                  <Label htmlFor="emailNotifications">
+                    {t("emailNotifications")}
+                  </Label>
                   <Switch
                     id="emailNotifications"
                     name="emailNotifications"
@@ -249,7 +287,9 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="smsNotifications">{t("smsNotifications")}</Label>
+                  <Label htmlFor="smsNotifications">
+                    {t("smsNotifications")}
+                  </Label>
                   <Switch
                     id="smsNotifications"
                     name="smsNotifications"
@@ -257,7 +297,9 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="pushNotifications">{t("pushNotifications")}</Label>
+                  <Label htmlFor="pushNotifications">
+                    {t("pushNotifications")}
+                  </Label>
                   <Switch
                     id="pushNotifications"
                     name="pushNotifications"
@@ -267,7 +309,9 @@ export default function SettingsPage() {
               </CardContent>
               <CardFooter>
                 <Button type="submit" disabled={isSaving}>
-                  {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isSaving && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   {t("save")}
                 </Button>
               </CardFooter>
@@ -285,10 +329,16 @@ export default function SettingsPage() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="twoFactorAuth">{t("twoFactorAuth")}</Label>
-                  <Switch id="twoFactorAuth" name="twoFactorAuth" defaultChecked={settings?.security.twoFactorAuth} />
+                  <Switch
+                    id="twoFactorAuth"
+                    name="twoFactorAuth"
+                    defaultChecked={settings?.security.twoFactorAuth}
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="sessionTimeout">{t("sessionTimeout")} (minutes)</Label>
+                  <Label htmlFor="sessionTimeout">
+                    {t("sessionTimeout")} (minutes)
+                  </Label>
                   <Input
                     id="sessionTimeout"
                     name="sessionTimeout"
@@ -305,31 +355,45 @@ export default function SettingsPage() {
                         id="minLength"
                         name="minLength"
                         type="number"
-                        defaultValue={settings?.security.passwordPolicy.minLength}
+                        defaultValue={
+                          settings?.security.passwordPolicy.minLength
+                        }
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="requireUppercase">{t("requireUppercase")}</Label>
+                      <Label htmlFor="requireUppercase">
+                        {t("requireUppercase")}
+                      </Label>
                       <Switch
                         id="requireUppercase"
                         name="requireUppercase"
-                        defaultChecked={settings?.security.passwordPolicy.requireUppercase}
+                        defaultChecked={
+                          settings?.security.passwordPolicy.requireUppercase
+                        }
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="requireNumbers">{t("requireNumbers")}</Label>
+                      <Label htmlFor="requireNumbers">
+                        {t("requireNumbers")}
+                      </Label>
                       <Switch
                         id="requireNumbers"
                         name="requireNumbers"
-                        defaultChecked={settings?.security.passwordPolicy.requireNumbers}
+                        defaultChecked={
+                          settings?.security.passwordPolicy.requireNumbers
+                        }
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="requireSpecialChars">{t("requireSpecialChars")}</Label>
+                      <Label htmlFor="requireSpecialChars">
+                        {t("requireSpecialChars")}
+                      </Label>
                       <Switch
                         id="requireSpecialChars"
                         name="requireSpecialChars"
-                        defaultChecked={settings?.security.passwordPolicy.requireSpecialChars}
+                        defaultChecked={
+                          settings?.security.passwordPolicy.requireSpecialChars
+                        }
                       />
                     </div>
                   </div>
@@ -337,7 +401,9 @@ export default function SettingsPage() {
               </CardContent>
               <CardFooter>
                 <Button type="submit" disabled={isSaving}>
-                  {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isSaving && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   {t("save")}
                 </Button>
               </CardFooter>
@@ -346,5 +412,5 @@ export default function SettingsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

@@ -1,27 +1,48 @@
-"use client"
+"use client";
 
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useLanguage } from "@/contexts/language-context"
-import { useNotifications } from "@/hooks/use-notifications"
-import { Skeleton } from "@/components/ui/skeleton"
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useLanguage } from "@/contexts/language-context";
+import { useNotifications } from "@/hooks/use-notifications";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
 export function NotificationsTable() {
-  const { t } = useLanguage()
-  const { data: notifications, isLoading } = useNotifications()
+  const { t } = useLanguage();
+  const { data: notifications, isLoading } = useNotifications();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState<any>(null);
+
+  const handleViewDetails = (notification: any) => {
+    setSelectedNotification(notification);
+    setIsDialogOpen(true);
+  };
 
   if (isLoading) {
     return (
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -59,11 +80,11 @@ export function NotificationsTable() {
           </TableBody>
         </Table>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
@@ -76,13 +97,17 @@ export function NotificationsTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {notifications.map((notification) => (
+          {notifications.map((notification: any) => (
             <TableRow key={notification.id}>
               <TableCell className="font-medium">{notification.id}</TableCell>
               <TableCell>{notification.title}</TableCell>
               <TableCell>
                 <Badge
-                  className={notification.recipient === "Premium foydalanuvchilar" ? "bg-red-500" : "bg-green-500"}
+                  className={
+                    notification.recipient === "Premium foydalanuvchilar"
+                      ? "bg-red-500 px-2 py-1"
+                      : "bg-green-500 px-2 py-1"
+                  }
                 >
                   {notification.recipient}
                 </Badge>
@@ -101,7 +126,11 @@ export function NotificationsTable() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>{t("actions")}</DropdownMenuLabel>
-                    <DropdownMenuItem>{t("view")}</DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleViewDetails(notification)}
+                    >
+                      {t("view")}
+                    </DropdownMenuItem>
                     <DropdownMenuItem>{t("send")}</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -110,6 +139,35 @@ export function NotificationsTable() {
           ))}
         </TableBody>
       </Table>
+
+      {/* Modal for Notification Details */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("notificationDetails")}</DialogTitle>
+          </DialogHeader>
+          {selectedNotification && (
+            <div className="space-y-4">
+              <p>
+                <strong>{t("title")}:</strong> {selectedNotification.title}
+              </p>
+              <p>
+                <strong>{t("recipient")}:</strong>{" "}
+                {selectedNotification.recipient}
+              </p>
+              <p>
+                <strong>{t("date")}:</strong> {selectedNotification.date}
+              </p>
+              <p>
+                <strong>{t("status")}:</strong> {selectedNotification.status}
+              </p>
+              <p>
+                <strong>{t("message")}:</strong> {selectedNotification.message}
+              </p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
-  )
+  );
 }

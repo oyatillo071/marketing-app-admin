@@ -1,79 +1,88 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useLanguage } from "@/contexts/language-context"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { useState } from "react"
-import { Loader2 } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLanguage } from "@/contexts/language-context";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 export default function ProfilePage() {
-  const { t } = useLanguage()
-  const [isSaving, setIsSaving] = useState(false)
+  const { t } = useLanguage();
+  const [isSaving, setIsSaving] = useState(false);
   const [profileData, setProfileData] = useState({
     name: "Admin User",
     email: "admin@example.com",
     phone: "+998 90 123 45 67",
-  })
+  });
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-  })
+  });
 
   const handleProfileSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSaving(true)
+    e.preventDefault();
+    setIsSaving(true);
 
     // Simulate API call
     setTimeout(() => {
-      setIsSaving(false)
+      setIsSaving(false);
       toast({
         title: t("profileUpdated"),
         description: t("profileUpdatedDescription"),
-      })
-    }, 1000)
-  }
+      });
+    }, 1000);
+  };
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSaving(true)
+    e.preventDefault();
+    setIsSaving(true);
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast({
         title: t("error"),
         description: t("passwordsDontMatch"),
         variant: "destructive",
-      })
-      setIsSaving(false)
-      return
+      });
+      setIsSaving(false);
+      return;
     }
 
     // Simulate API call
     setTimeout(() => {
-      setIsSaving(false)
+      setIsSaving(false);
       setPasswordData({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
-      })
+      });
       toast({
         title: t("passwordUpdated"),
         description: t("passwordUpdatedDescription"),
-      })
-    }, 1000)
-  }
+      });
+    }, 1000);
+  };
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">{t("profile")}</h2>
+        <h2 className="md:text-3xl text-xl text-left font-bold tracking-tight">
+          {t("profile")}
+        </h2>
       </div>
 
       <div className="flex items-center space-x-4">
@@ -97,7 +106,9 @@ export default function ProfilePage() {
             <form onSubmit={handleProfileSubmit}>
               <CardHeader>
                 <CardTitle>{t("profileInformation")}</CardTitle>
-                <CardDescription>{t("updateYourProfileInformation")}</CardDescription>
+                <CardDescription>
+                  {t("updateYourProfileInformation")}
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -105,7 +116,9 @@ export default function ProfilePage() {
                   <Input
                     id="name"
                     value={profileData.name}
-                    onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                    onChange={(e) =>
+                      setProfileData({ ...profileData, name: e.target.value })
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -114,7 +127,9 @@ export default function ProfilePage() {
                     id="email"
                     type="email"
                     value={profileData.email}
-                    onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                    onChange={(e) =>
+                      setProfileData({ ...profileData, email: e.target.value })
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -122,13 +137,17 @@ export default function ProfilePage() {
                   <Input
                     id="phone"
                     value={profileData.phone}
-                    onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                    onChange={(e) =>
+                      setProfileData({ ...profileData, phone: e.target.value })
+                    }
                   />
                 </div>
               </CardContent>
               <CardFooter>
                 <Button type="submit" disabled={isSaving}>
-                  {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isSaving && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   {t("save")}
                 </Button>
               </CardFooter>
@@ -145,12 +164,19 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="current-password">{t("currentPassword")}</Label>
+                  <Label htmlFor="current-password">
+                    {t("currentPassword")}
+                  </Label>
                   <Input
                     id="current-password"
                     type="password"
                     value={passwordData.currentPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                    onChange={(e) =>
+                      setPasswordData({
+                        ...passwordData,
+                        currentPassword: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
@@ -160,24 +186,38 @@ export default function ProfilePage() {
                     id="new-password"
                     type="password"
                     value={passwordData.newPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                    onChange={(e) =>
+                      setPasswordData({
+                        ...passwordData,
+                        newPassword: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-password">{t("confirmPassword")}</Label>
+                  <Label htmlFor="confirm-password">
+                    {t("confirmPassword")}
+                  </Label>
                   <Input
                     id="confirm-password"
                     type="password"
                     value={passwordData.confirmPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                    onChange={(e) =>
+                      setPasswordData({
+                        ...passwordData,
+                        confirmPassword: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
               </CardContent>
               <CardFooter>
                 <Button type="submit" disabled={isSaving}>
-                  {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isSaving && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   {t("changePassword")}
                 </Button>
               </CardFooter>
@@ -186,5 +226,5 @@ export default function ProfilePage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

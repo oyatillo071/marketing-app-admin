@@ -1,26 +1,33 @@
-"use client"
+"use client";
 
-import { usePayments } from "@/hooks/use-payments"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Download, Loader2, Search } from "lucide-react"
-import { useState } from "react"
-import { exportToPDF } from "@/lib/pdf-export"
-import { useLanguage } from "@/contexts/language-context"
+import { usePayments } from "@/hooks/use-payments";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Download, Loader2, Search } from "lucide-react";
+import { useState } from "react";
+import { exportToPDF } from "@/lib/pdf-export";
+import { useLanguage } from "@/contexts/language-context";
 
 export default function PaymentsPage() {
-  const { t } = useLanguage()
-  const { data: payments, isLoading } = usePayments()
-  const [searchTerm, setSearchTerm] = useState("")
+  const { t } = useLanguage();
+  const { data: payments, isLoading } = usePayments();
+  const [searchTerm, setSearchTerm] = useState("");
 
   const filteredPayments = payments.filter(
     (payment) =>
       payment.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.id.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      payment.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleExport = () => {
     const columns = [
@@ -29,15 +36,17 @@ export default function PaymentsPage() {
       { header: t("amount"), accessor: "amount" },
       { header: t("status"), accessor: "status" },
       { header: t("date"), accessor: "date" },
-    ]
+    ];
 
-    exportToPDF(payments, columns, t("payments"), "payments-export")
-  }
+    exportToPDF(payments, columns, t("payments"), "payments-export");
+  };
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">{t("payments")}</h2>
+      <div className="flex md:items-center justify-between md:flex-row flex-col gap-4">
+        <h2 className="md:text-3xl text-2xl whitespace-nowrap font-bold tracking-tight">
+          {t("payments")}
+        </h2>
         <Button variant="outline" size="sm" onClick={handleExport}>
           <Download className="mr-2 h-4 w-4" />
           {t("downloadPDF")}
@@ -45,7 +54,9 @@ export default function PaymentsPage() {
       </div>
       <div>
         <h3 className="text-lg font-medium">{t("allPayments")}</h3>
-        <p className="text-sm text-muted-foreground">{t("paymentsDescription")}</p>
+        <p className="text-sm text-muted-foreground">
+          {t("paymentsDescription")}
+        </p>
       </div>
       <div className="flex items-center gap-2">
         <div className="relative w-full max-w-sm">
@@ -83,7 +94,9 @@ export default function PaymentsPage() {
                     <TableCell>
                       <div className="flex items-center">
                         <Avatar className="h-8 w-8 mr-2 bg-red-500">
-                          <AvatarFallback>{payment.user.initials}</AvatarFallback>
+                          <AvatarFallback>
+                            {payment.user.initials}
+                          </AvatarFallback>
                         </Avatar>
                         {payment.user.name}
                       </div>
@@ -107,5 +120,5 @@ export default function PaymentsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

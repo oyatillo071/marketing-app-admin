@@ -1,7 +1,6 @@
 "use client";
 
-import type React from "react";
-
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UsersTable } from "@/components/users/users-table";
@@ -15,7 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -36,6 +34,7 @@ export default function UsersPage() {
     email: "",
     tariff: "Basic",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleExportPDF = () => {
     const columns = [
@@ -52,19 +51,45 @@ export default function UsersPage() {
     exportToPDF(users, columns, t("users"), "users-export");
   };
 
-  const handleAddUser = (e: React.FormEvent) => {
+  const handleAddUser = async (e) => {
     e.preventDefault();
-    // In a real app, this would call an API to add the user
-    toast({
-      title: t("success"),
-      description: t("userAdded"),
-    });
-    setIsAddDialogOpen(false);
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser),
+      });
+
+      if (!response.ok) {
+        throw new Error(t("errorOccurred"));
+      }
+
+      toast({
+        title: t("success"),
+        description: t("userAdded"),
+      });
+
+      setNewUser({ name: "", phone: "", email: "", tariff: "Basic" });
+      setIsAddDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: t("error"),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex items-center justify-between">
+    <div className="flex-1 space-y-6 p-4 md:p-8 pt-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <h2 className="text-3xl font-bold tracking-tight">{t("users")}</h2>
         <div className="flex items-center gap-2">
           <DropdownMenu>
@@ -78,8 +103,8 @@ export default function UsersPage() {
               <DropdownMenuItem onClick={handleExportPDF}>
                 {t("downloadPDF")}
               </DropdownMenuItem>
-              <DropdownMenuItem>{t("downloadCSV")}</DropdownMenuItem>
-              <DropdownMenuItem>{t("downloadExcel")}</DropdownMenuItem>
+              {/* <DropdownMenuItem>{t("downloadCSV")}</DropdownMenuItem> */}
+              {/* <DropdownMenuItem>{t("downloadExcel")}</DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
           <Button
@@ -92,13 +117,17 @@ export default function UsersPage() {
           </Button>
         </div>
       </div>
+
+      {/* Description */}
       <div>
         <h3 className="text-lg font-medium">{t("allUsers")}</h3>
         <p className="text-sm text-muted-foreground">{t("usersDescription")}</p>
       </div>
 
+      {/* Users Table */}
       <UsersTable />
 
+      {/* Add User Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -153,7 +182,9 @@ export default function UsersPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">{t("save")}</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? t("loading") : t("save")}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
