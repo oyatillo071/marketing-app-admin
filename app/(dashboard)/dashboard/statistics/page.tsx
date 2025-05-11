@@ -1,32 +1,46 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowUpRight, BarChart3, DollarSign, Download, Loader2, Users } from "lucide-react"
-import { RevenueChart } from "@/components/dashboard/revenue-chart"
-import { TariffDistributionChart } from "@/components/statistics/tariff-distribution-chart"
-import { useLanguage } from "@/contexts/language-context"
-import { useStatistics } from "@/hooks/use-statistics"
-import { Button } from "@/components/ui/button"
-import { exportStatsToPDF } from "@/lib/pdf-export"
-import { usePayments } from "@/hooks/use-payments"
-import { useWithdrawals } from "@/hooks/use-withdrawals"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { UserActivityChart } from "@/components/statistics/user-activity-chart"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  ArrowUpRight,
+  BarChart3,
+  DollarSign,
+  Download,
+  Loader2,
+  Users,
+} from "lucide-react";
+import { RevenueChart } from "@/components/dashboard/revenue-chart";
+import { TariffDistributionChart } from "@/components/statistics/tariff-distribution-chart";
+import { useLanguage } from "@/contexts/language-context";
+import { useStatistics } from "@/hooks/use-statistics";
+import { Button } from "@/components/ui/button";
+import { exportStatsToPDF } from "@/lib/pdf-export";
+import { usePayments } from "@/hooks/use-payments";
+import { useWithdrawals } from "@/hooks/use-withdrawals";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { UserActivityChart } from "@/components/statistics/user-activity-chart";
 
 export default function StatisticsPage() {
-  const { t } = useLanguage()
-  const { data: statistics, isLoading } = useStatistics()
-  const { data: payments } = usePayments()
-  const { data: withdrawals } = useWithdrawals()
+  const { t } = useLanguage();
+  const { data: statistics, isLoading } = useStatistics();
+  const { data: payments } = usePayments();
+  const { data: withdrawals } = useWithdrawals();
 
   const handleExport = () => {
     if (statistics) {
-      exportStatsToPDF(statistics, t("statistics"), "statistics-export")
+      exportStatsToPDF(statistics, t("statistics"), "statistics-export");
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -36,20 +50,22 @@ export default function StatisticsPage() {
           <p>{t("loading")}</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!statistics) {
     return (
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold tracking-tight">{t("statistics")}</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            {t("statistics")}
+          </h2>
         </div>
         <div className="flex items-center justify-center h-64">
           <p>{t("noDataFound")}</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -72,11 +88,15 @@ export default function StatisticsPage() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t("totalUsers")}</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  {t("totalUsers")}
+                </CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{statistics.userStats.total}</div>
+                <div className="text-2xl font-bold">
+                  {statistics.userStats.total}
+                </div>
                 <p className="text-xs text-muted-foreground">{t("allUsers")}</p>
                 <div className="text-sm font-medium text-green-500 mt-2">
                   +{statistics.userStats.growth}% {t("comparedToLastMonth")}
@@ -85,11 +105,15 @@ export default function StatisticsPage() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t("totalRevenue")}</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  {t("totalRevenue")}
+                </CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${statistics.revenueStats.total.toLocaleString()}</div>
+                <div className="text-2xl font-bold">
+                  ${statistics.revenueStats.total.toLocaleString()}
+                </div>
                 <p className="text-xs text-muted-foreground">{t("allTime")}</p>
                 <div className="text-sm font-medium text-green-500 mt-2">
                   +{statistics.revenueStats.growth}% {t("comparedToLastMonth")}
@@ -98,12 +122,18 @@ export default function StatisticsPage() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t("activeTariffs")}</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  {t("activeTariffs")}
+                </CardTitle>
                 <BarChart3 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{statistics.tariffStats.total}</div>
-                <p className="text-xs text-muted-foreground">{t("currentlyActiveTariffs")}</p>
+                <div className="text-2xl font-bold">
+                  {statistics.tariffStats.total}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {t("currentlyActiveTariffs")}
+                </p>
                 <div className="text-sm font-medium text-green-500 mt-2">
                   +{statistics.tariffStats.growth}% {t("comparedToLastMonth")}
                 </div>
@@ -111,14 +141,21 @@ export default function StatisticsPage() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t("pendingWithdrawals")}</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  {t("pendingWithdrawals")}
+                </CardTitle>
                 <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{statistics.withdrawalStats.pending}</div>
-                <p className="text-xs text-muted-foreground">{t("withdrawalRequests")}</p>
+                <div className="text-2xl font-bold">
+                  {statistics.withdrawalStats.pending}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {t("withdrawalRequests")}
+                </p>
                 <div className="text-sm font-medium text-red-500 mt-2">
-                  {statistics.withdrawalStats.growth}% {t("comparedToLastMonth")}
+                  {statistics.withdrawalStats.growth}%{" "}
+                  {t("comparedToLastMonth")}
                 </div>
               </CardContent>
             </Card>
@@ -139,9 +176,21 @@ export default function StatisticsPage() {
               <CardContent>
                 <TariffDistributionChart
                   data={[
-                    { name: "Premium", value: statistics.tariffStats.premium, color: "#ef4444" },
-                    { name: "Standard", value: statistics.tariffStats.standard, color: "#22c55e" },
-                    { name: "Basic", value: statistics.tariffStats.basic, color: "#6b7280" },
+                    {
+                      name: "Premium",
+                      value: statistics.tariffStats.premium,
+                      color: "#ef4444",
+                    },
+                    {
+                      name: "Standard",
+                      value: statistics.tariffStats.standard,
+                      color: "#22c55e",
+                    },
+                    {
+                      name: "Basic",
+                      value: statistics.tariffStats.basic,
+                      color: "#6b7280",
+                    },
                   ]}
                 />
               </CardContent>
@@ -164,7 +213,11 @@ export default function StatisticsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>{t("paymentStatistics")}</CardTitle>
-              <Button variant="outline" size="sm" onClick={() => exportToPDF(payments)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => exportToPDF(payments)}
+              >
                 <Download className="mr-2 h-4 w-4" />
                 {t("downloadPDF")}
               </Button>
@@ -183,20 +236,26 @@ export default function StatisticsPage() {
                   </TableHeader>
                   <TableBody>
                     {payments && payments.length > 0 ? (
-                      payments.slice(0, 5).map((payment) => (
+                      payments.slice(0, 5).map((payment: any) => (
                         <TableRow key={payment.id}>
-                          <TableCell className="font-medium">{payment.id}</TableCell>
+                          <TableCell className="font-medium">
+                            {payment.id}
+                          </TableCell>
                           <TableCell>
                             <div className="flex items-center">
                               <Avatar className="h-8 w-8 mr-2 bg-red-500">
-                                <AvatarFallback>{payment.user.initials}</AvatarFallback>
+                                <AvatarFallback>
+                                  {payment.user.initials}
+                                </AvatarFallback>
                               </Avatar>
                               {payment.user.name}
                             </div>
                           </TableCell>
                           <TableCell>${payment.amount.toFixed(2)}</TableCell>
                           <TableCell>
-                            <Badge className="bg-green-500">{payment.status}</Badge>
+                            <Badge className="bg-green-500">
+                              {payment.status}
+                            </Badge>
                           </TableCell>
                           <TableCell>{payment.date}</TableCell>
                         </TableRow>
@@ -218,7 +277,11 @@ export default function StatisticsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>{t("withdrawalStatistics")}</CardTitle>
-              <Button variant="outline" size="sm" onClick={() => exportToPDF(withdrawals)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => exportToPDF(withdrawals)}
+              >
                 <Download className="mr-2 h-4 w-4" />
                 {t("downloadPDF")}
               </Button>
@@ -238,13 +301,17 @@ export default function StatisticsPage() {
                   </TableHeader>
                   <TableBody>
                     {withdrawals && withdrawals.length > 0 ? (
-                      withdrawals.slice(0, 5).map((withdrawal) => (
+                      withdrawals.slice(0, 5).map((withdrawal: any) => (
                         <TableRow key={withdrawal.id}>
-                          <TableCell className="font-medium">{withdrawal.id}</TableCell>
+                          <TableCell className="font-medium">
+                            {withdrawal.id}
+                          </TableCell>
                           <TableCell>
                             <div className="flex items-center">
                               <Avatar className="h-8 w-8 mr-2 bg-red-500">
-                                <AvatarFallback>{withdrawal.user.initials}</AvatarFallback>
+                                <AvatarFallback>
+                                  {withdrawal.user.initials}
+                                </AvatarFallback>
                               </Avatar>
                               {withdrawal.user.name}
                             </div>
@@ -257,8 +324,8 @@ export default function StatisticsPage() {
                                 withdrawal.status === "To'langan"
                                   ? "bg-green-500"
                                   : withdrawal.status === "Kutilmoqda"
-                                    ? "bg-gray-500"
-                                    : "bg-red-500"
+                                  ? "bg-gray-500"
+                                  : "bg-red-500"
                               }
                             >
                               {withdrawal.status}
@@ -282,12 +349,12 @@ export default function StatisticsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
 
 function exportToPDF(data: any[]) {
   // Import the exportToPDF function from lib/pdf-export
-  const { exportToPDF } = require("@/lib/pdf-export")
+  const { exportToPDF } = require("@/lib/pdf-export");
 
   // Define columns for the PDF
   const columns = [
@@ -296,8 +363,8 @@ function exportToPDF(data: any[]) {
     { header: "Amount", accessor: "amount" },
     { header: "Status", accessor: "status" },
     { header: "Date", accessor: "date" },
-  ]
+  ];
 
   // Call the exportToPDF function
-  exportToPDF(data, columns, "Export", "export-data")
+  exportToPDF(data, columns, "Export", "export-data");
 }

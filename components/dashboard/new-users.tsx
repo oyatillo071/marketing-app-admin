@@ -1,25 +1,32 @@
-"use client"
+"use client";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useLanguage } from "@/contexts/language-context"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useLanguage } from "@/contexts/language-context";
 
 type NewUsersProps = {
   data: Array<{
-    id: string
-    name: string
-    initials: string
-    phone: string
-    tariff: string
-    status: string
-    registrationDate: string
-  }>
-}
+    id: string;
+    name: string;
+    initials: string;
+    phone: string;
+    tariff: string;
+    status: string;
+    registrationDate: string;
+  }>;
+};
 
 export function NewUsers({ data }: NewUsersProps) {
-  const { t } = useLanguage()
+  const { t } = useLanguage();
 
   if (!data || data.length === 0) {
     return (
@@ -62,7 +69,7 @@ export function NewUsers({ data }: NewUsersProps) {
           ))}
         </TableBody>
       </Table>
-    )
+    );
   }
 
   return (
@@ -89,23 +96,33 @@ export function NewUsers({ data }: NewUsersProps) {
                 {user.name}
               </div>
             </TableCell>
-            <TableCell>{user.phone}</TableCell>
+            <TableCell className="whitespace-nowrap">{user.phone}</TableCell>
             <TableCell>
               <Badge
                 className={
-                  user.tariff === "Premium" ? "bg-red-500" : user.tariff === "Standard" ? "bg-green-500" : "bg-gray-500"
+                  user.tariff === "Premium"
+                    ? "bg-red-500"
+                    : user.tariff === "Standard"
+                    ? "bg-green-500"
+                    : "bg-gray-500"
                 }
               >
                 {user.tariff}
               </Badge>
             </TableCell>
             <TableCell>
-              <Badge className={user.status === "Faol" ? "bg-green-500" : "bg-red-500"}>{user.status}</Badge>
+              <Badge
+                className={
+                  user.status === "Faol" ? "bg-green-500" : "bg-red-500"
+                }
+              >
+                {user.status}
+              </Badge>
             </TableCell>
             <TableCell>{user.registrationDate}</TableCell>
           </TableRow>
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }
