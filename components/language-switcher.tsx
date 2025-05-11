@@ -1,8 +1,13 @@
-"use client"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Globe } from "lucide-react"
-import { useLanguage } from "@/contexts/language-context"
+"use client";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Globe } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
 
 const languages = [
   { code: "uz", name: "Uzbek" },
@@ -11,10 +16,10 @@ const languages = [
   { code: "kz", name: "Kazakh" },
   { code: "kg", name: "Kyrgyz" },
   { code: "tj", name: "Tajik" },
-]
+];
 
 export function LanguageSwitcher() {
-  const { language, setLanguage, t } = useLanguage()
+  const { language, setLanguage, t } = useLanguage();
 
   return (
     <DropdownMenu>
@@ -28,12 +33,12 @@ export function LanguageSwitcher() {
           <DropdownMenuItem
             key={lang.code}
             onClick={() => setLanguage(lang.code as any)}
-            className={language === lang.code ? "bg-secondary-bg" : ""}
+            className={language === lang.code ? "bg-transparent" : ""}
           >
             {lang.name}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

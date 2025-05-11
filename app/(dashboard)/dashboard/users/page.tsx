@@ -96,9 +96,7 @@ export default function UsersPage() {
         <h3 className="text-lg font-medium">{t("allUsers")}</h3>
         <p className="text-sm text-muted-foreground">{t("usersDescription")}</p>
       </div>
-      <div className="flex items-center gap-2">
-        <Input placeholder={t("searchUsers")} className="max-w-sm" />
-      </div>
+
       <UsersTable />
 
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -110,18 +108,20 @@ export default function UsersPage() {
           </DialogHeader>
           <form onSubmit={handleAddUser}>
             <div className="grid gap-4 py-4">
-              {/* <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">
                   {t("name")}
                 </Label>
                 <Input
                   id="name"
                   value={newUser.name}
-                  onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, name: e.target.value })
+                  }
                   className="col-span-3"
                   required
                 />
-              </div> */}
+              </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="phone" className="text-right">
                   {t("phone")}
