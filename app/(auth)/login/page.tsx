@@ -1,11 +1,11 @@
-import type { Metadata } from "next"
-import Link from "next/link"
-import { UserAuthForm } from "@/components/auth/user-auth-form"
+import type { Metadata } from "next";
+import Link from "next/link";
+import { UserAuthForm } from "@/components/auth/user-auth-form";
 
 export const metadata: Metadata = {
   title: "Login",
   description: "Login to your account",
-}
+};
 
 export default function LoginPage() {
   return (
@@ -30,8 +30,9 @@ export default function LoginPage() {
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-lg">
-              &ldquo;Bu admin panel orqali siz platformangizni boshqarishingiz, foydalanuvchilarni kuzatishingiz va
-              daromadlaringizni kuzatib borishingiz mumkin.&rdquo;
+              &ldquo;Bu admin panel orqali siz platformangizni boshqarishingiz,
+              foydalanuvchilarni kuzatishingiz va daromadlaringizni kuzatib
+              borishingiz mumkin.&rdquo;
             </p>
             <footer className="text-sm">Admin Panel</footer>
           </blockquote>
@@ -40,19 +41,24 @@ export default function LoginPage() {
       <div className="lg:p-8">
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">Tizimga kirish</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Tizimga kirish
+            </h1>
             <p className="text-sm text-muted-foreground">
               Admin panel tizimiga kirish uchun ma'lumotlaringizni kiriting
             </p>
           </div>
           <UserAuthForm />
           <p className="px-8 text-center text-sm text-muted-foreground">
-            <Link href="/reset-password" className="hover:text-brand underline underline-offset-4">
+            <Link
+              href="/reset-password"
+              className="hover:text-brand underline underline-offset-4"
+            >
               Parolni unutdingizmi?
             </Link>
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }

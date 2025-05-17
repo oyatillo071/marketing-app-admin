@@ -9,7 +9,7 @@ import {
 import { Globe } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 
-const languages = [
+export const languages = [
   { code: "uz", name: "Uzbek" },
   { code: "en", name: "English" },
   { code: "ru", name: "Russian" },

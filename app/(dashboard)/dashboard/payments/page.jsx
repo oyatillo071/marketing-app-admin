@@ -17,6 +17,7 @@ import { Download, Loader2, Search } from "lucide-react";
 import { useState } from "react";
 import { exportToPDF } from "@/lib/pdf-export";
 import { useLanguage } from "@/contexts/language-context";
+// import CardsSection from "./Card/page.jsx";
 
 export default function PaymentsPage() {
   const { t } = useLanguage();
@@ -69,6 +70,7 @@ export default function PaymentsPage() {
           />
         </div>
       </div>
+      {/* <CardsSection /> */}
 
       {isLoading ? (
         <div className="flex items-center justify-center h-64">

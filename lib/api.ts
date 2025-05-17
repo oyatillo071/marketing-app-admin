@@ -1,10 +1,12 @@
 import axios from "axios";
 import mockData from "@/data/data.json";
 import { API_CONFIG } from "@/config/api";
+import { log } from "util";
 
 // Create axios instance
 const api = axios.create({
-  baseURL: API_CONFIG.API_BASE_URL,
+  // baseURL: API_CONFIG.API_BASE_URL,
+  baseURL: "http://192.168.54.196:3000",
   headers: {
     "Content-Type": "application/json",
   },
@@ -26,30 +28,32 @@ export const useMockData = () => {
 
 // Auth
 export const loginUser = async (email: string, password: string) => {
-  if (useMockData()) {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 300));
+  // if (useMockData()) {
+  //   // Simulate API delay
+  //   await new Promise((resolve) => setTimeout(resolve, 300));
 
-    // For demo purposes, any credentials will work
-    if (email && password) {
-      // Generate a mock token
-      const token = `mock-token-${Date.now()}`;
-      localStorage.setItem("token", token);
+  //   // For demo purposes, any credentials will work
+  //   if (email && password) {
+  //     // Generate a mock token
+  //     const token = `mock-token-${Date.now()}`;
+  //     localStorage.setItem("token", token);
 
-      return {
-        id: "admin",
-        email,
-        name: "Admin User",
-        role: "admin",
-        token,
-      };
-    }
+  //     return {
+  //       id: "admin",
+  //       email,
+  //       name: "Admin User",
+  //       role: "admin",
+  //       token,
+  //     };
+  //   }
 
-    throw new Error("Invalid credentials");
-  }
+  //   throw new Error("Invalid credentials");
+  // }
 
-  const response = await api.post("/auth/login", { email, password });
+  const response = await api.post("/authorization/login", { email, password });
   localStorage.setItem("token", response.data.token);
+  localStorage.setItem("mlm-data", JSON.stringify(response.data.data));
+
   return response.data;
 };
 
@@ -88,8 +92,8 @@ export const verifyResetCode = async (phone: string, code: string) => {
   return response.data;
 };
 
-export const setNewPassword = async (
-  phone: string,
+export const setNewPasswordApi = async (
+  email: string,
   code: string,
   newPassword: string
 ) => {
@@ -101,7 +105,7 @@ export const setNewPassword = async (
   }
 
   const response = await api.post("/auth/set-new-password", {
-    phone,
+    email,
     code,
     newPassword,
   });
@@ -204,11 +208,6 @@ export const rejectWithdrawal = async (id: string, reason: string) => {
 
 // Tariffs
 export const fetchTariffs = async () => {
-  if (useMockData()) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return mockData.tariffs;
-  }
-
   const response = await api.get("/tariffs");
   return response.data;
 };
@@ -303,4 +302,75 @@ export const updateSettings = async (data: any) => {
 
   const response = await api.put("/settings", data);
   return response.data;
+};
+
+// Karta qo'shish
+export const addCard = async (data: any) => {
+  const response = await api.post("/card/add", data);
+  console.log(response.data, "309 qator");
+
+  return response.data;
+};
+
+// Barcha kartalarni olish
+export const fetchCards = async () => {
+  const response = await api.get("/card");
+  return response.data;
+};
+
+// Karta o'chirish
+export const deleteCard = async (id: string) => {
+  const response = await api.delete(`/card/${id}`);
+  return response.data;
+};
+
+// Karta tahrirlash (qo'shimcha endpoint kerak bo'lishi mumkin)
+export const updateCard = async (id: string, data: any) => {
+  const response = await api.put(`/card/${id}`, data);
+  return response.data;
+};
+
+// Type bo'yicha filter
+export const fetchCardsByType = async (type: string) => {
+  const response = await api.get(`/card/type/${type}`);
+  return response.data;
+};
+
+// Davlat bo'yicha filter
+export const fetchCardsByCountry = async (countries: string) => {
+  const response = await api.get(`/card/cauntries/${countries}`);
+  return response.data;
+};
+
+export const apiProducts = async () => {
+  const res = await api("/product");
+  return res.data;
+};
+export const addProduct = async (data: any) => {
+  console.log(data, "data 350qator");
+
+  const res = await api.post("/product/add", data);
+  return res.data;
+};
+
+export const updateProduct = async (id: string, data: any) => {
+  const res = await api.put(`/product/${id}`, data);
+  return res.data;
+};
+export const deleteProduct = async (id: string) => {
+  await api.delete(`/product/${id}`);
+};
+
+// upload image
+export const uploadImage = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  // api.upload orqali POST so‘rov yuboriladi
+  const res = await api.post("/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return res.data; // { url: "...", path: "..." }
 };
