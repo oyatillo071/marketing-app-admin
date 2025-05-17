@@ -5,8 +5,7 @@ import { log } from "util";
 
 // Create axios instance
 const api = axios.create({
-  // baseURL: API_CONFIG.API_BASE_URL,
-  baseURL: "http://192.168.54.196:3000",
+  baseURL: API_CONFIG.API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
