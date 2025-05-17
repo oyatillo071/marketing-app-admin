@@ -113,48 +113,34 @@ export const setNewPasswordApi = async (
 
 // Users
 export const fetchUsers = async () => {
-  if (useMockData()) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return mockData.users;
-  }
-
   const response = await api.get("/users");
   return response.data;
 };
 
 export const fetchUserById = async (id: string) => {
-  if (useMockData()) {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    const user = mockData.users.find((u) => u.id === id);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    return user;
-  }
-
   const response = await api.get(`/users/${id}`);
   return response.data;
 };
 
 export const updateUser = async (id: string, data: any) => {
-  if (useMockData()) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return { ...data, id };
-  }
-
   const response = await api.put(`/users/${id}`, data);
   return response.data;
 };
 
 export const deleteUser = async (id: string) => {
-  if (useMockData()) {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return { success: true };
-  }
-
   const response = await api.delete(`/users/${id}`);
+  return response.data;
+};
+
+// Block a user by id
+export const blockUser = async (id: string) => {
+  const response = await api.get(`/users/block/${id}`);
+  return response.data;
+};
+
+// Unblock a user by id
+export const unblockUser = async (id: string) => {
+  const response = await api.get(`/users/deblock/${id}`);
   return response.data;
 };
 
@@ -372,4 +358,21 @@ export const uploadImage = async (file: File) => {
     },
   });
   return res.data; // { url: "...", path: "..." }
+};
+
+// admin section
+export const addAdmin = async (admin: {
+  name: string;
+  email: string;
+  password: string;
+  role: "ADMIN" | "SUPERADMIN";
+}) => {
+  const response = await api.post("/admin/add", admin);
+  return response.data;
+};
+
+// Barcha adminlarni olish (GET /admin)
+export const fetchAdmins = async () => {
+  const response = await api.get("/admin");
+  return response.data;
 };

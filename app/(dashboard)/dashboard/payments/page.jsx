@@ -17,6 +17,7 @@ import { Download, Loader2, Search } from "lucide-react";
 import { useState } from "react";
 import { exportToPDF } from "@/lib/pdf-export";
 import { useLanguage } from "@/contexts/language-context";
+import Link from "next/link";
 // import CardsSection from "./Card/page.jsx";
 
 export default function PaymentsPage() {
@@ -48,10 +49,17 @@ export default function PaymentsPage() {
         <h2 className="md:text-3xl text-2xl whitespace-nowrap font-bold tracking-tight">
           {t("payments")}
         </h2>
-        <Button variant="outline" size="sm" onClick={handleExport}>
-          <Download className="mr-2 h-4 w-4" />
-          {t("downloadPDF")}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleExport}>
+            <Download className="mr-2 h-4 w-4" />
+            {t("downloadPDF")}
+          </Button>
+          <Link href="/dashboard/payments/card">
+            <Button variant="default" size="sm">
+              {t("cards")}
+            </Button>
+          </Link>
+        </div>
       </div>
       <div>
         <h3 className="text-lg font-medium">{t("allPayments")}</h3>

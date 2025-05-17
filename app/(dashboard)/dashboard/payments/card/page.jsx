@@ -25,6 +25,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { languages } from "@/components/language-switcher";
+import Link from "next/link";
 
 const cardTypes = ["click", "uzcard", "humo"];
 const countries = languages;
@@ -365,6 +366,14 @@ export default function CardsSection() {
               </form>
             </DialogContent>
           </Dialog>
+          <Link href="/dashboard/payments">
+            <Button
+              variant="outline"
+              className="text-xs sm:text-sm md:text-base"
+            >
+              {t("toPayments") || "Payments"}
+            </Button>
+          </Link>
         </div>
       </div>
 
