@@ -5,12 +5,22 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationBell } from "@/components/notification-bell";
 import { UserProfile } from "@/components/user-profile";
-
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  useEffect(() => {
+    // This is a workaround for a known issue with the `use client` directive
+    // in Next.js. It ensures that the component is only rendered on the client side.
+    if (typeof window !== "undefined") {
+      if (!localStorage.getItem("mlm_user")) {
+        useRouter().push("/login");
+      }
+    }
+  }, []);
   return (
     <div className="min-h-screen bg-background">
       {/* Sidebar component */}

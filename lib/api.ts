@@ -20,6 +20,20 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Add response interceptor for auth errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Helper to determine if we should use mock data or real API
 export const useMockData = () => {
   return !API_CONFIG.API_BASE_URL;
