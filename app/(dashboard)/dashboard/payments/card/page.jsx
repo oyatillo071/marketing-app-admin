@@ -69,16 +69,29 @@ export default function CardsSection() {
   }, [loadCards]);
 
   // Form validation
-  const validate = useCallback(() => {
-    const errs = {};
-    if (!form.card_seria_number.match(/^\d{9,}$/))
-      errs.card_seria_number = t("invalidCardNumber");
-    if (!form.cauntries && !form.custom_country)
-      errs.cauntries = t("selectCountry");
-    if (!form.card_type && !form.custom_type) errs.card_type = t("selectType");
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
-  }, [form, t]);
+  // const validate = useCallback(() => {
+  //   const errs = {};
+  //   if (!form.card_seria_number.match(/^\d{9,}$/))
+  //     errs.card_seria_number = t("invalidCardNumber");
+  //   if (!form.cauntries && !form.custom_country)
+  //     errs.cauntries = t("selectCountry");
+  //   if (!form.card_type && !form.custom_type) errs.card_type = t("selectType");
+  //   setErrors(errs);
+  //   return Object.keys(errs).length === 0;
+  // }, [form, t]);
+  // Form validation
+const validate = useCallback(() => {
+  const errs = {};
+  // Bo'sh joylarni olib tashlash orqali validatsiya
+  const rawCardNumber = form.card_seria_number.replace(/\s/g, '');
+  if (!rawCardNumber.match(/^\d{9,}$/))
+    errs.card_seria_number = t("invalidCardNumber");
+  if (!form.cauntries && !form.custom_country)
+    errs.cauntries = t("selectCountry");
+  if (!form.card_type && !form.custom_type) errs.card_type = t("selectType");
+  setErrors(errs);
+  return Object.keys(errs).length === 0;
+}, [form, t]);
 
   // Handle form submit
   const handleSubmit = useCallback(
