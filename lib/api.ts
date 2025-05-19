@@ -81,7 +81,10 @@ export const loginUser = async (email: string, password: string) => {
   const response = await api.post("/authorization/login", { email, password });
   localStorage.setItem("token", response.data.token);
   localStorage.setItem("mlm-data", JSON.stringify(response.data.data));
-  localStorage.setItem("mlm_role", JSON.stringify(response.data.data.role));
+  localStorage.setItem(
+    "mlm_role",
+    JSON.stringify(response.data.data.user.role)
+  );
   return response.data;
 };
 

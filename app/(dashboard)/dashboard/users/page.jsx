@@ -38,12 +38,27 @@ import {
 } from "@/components/ui/select";
 
 // You should get this from auth context or props in real app
-const CURRENT_USER_ROLE = localStorage.getItem("mlm_role") || "admin";
 export default function UsersPage() {
   const { t } = useLanguage();
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [currentUserRole, setCurrentUserRole] = useState("ADMIN");
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const role = localStorage.getItem("mlm_role");
+      if (role) {
+        try {
+          setCurrentUserRole(JSON.parse(role));
+        } catch {
+          setCurrentUserRole("ADMIN");
+        }
+      }
+    }
+  }, []);
+
+  // const currentUserRole = localStorage.getItem("mlm_role") || "admin";
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
@@ -66,11 +81,7 @@ export default function UsersPage() {
       const data = await fetchUsers();
       setUsers(data);
     } catch (error) {
-      toast({
-        title: t("error"),
-        description: t("errorOccurred"),
-        variant: "destructive",
-      });
+      toast.error(t("errorOccurred"));
     } finally {
       setIsLoading(false);
     }
@@ -237,7 +248,7 @@ export default function UsersPage() {
     }
 
     try {
-      if (CURRENT_USER_ROLE === "SUPERADMIN") {
+      if (currentUserRole === "SUPERADMIN") {
         // SUPERADMIN qo'shishni bloklash (lekin kodi bor)
         if (userToAdd.role === "SUPERADMIN") {
           // Kod bor, lekin ishlamaydi:
@@ -310,7 +321,7 @@ export default function UsersPage() {
             </DropdownMenuContent>
           </DropdownMenu>
           {/* Only SUPERADMIN can add ADMIN or SUPERADMIN */}
-          {CURRENT_USER_ROLE === "SUPERADMIN" && (
+          {currentUserRole == "SUPERADMIN" && (
             <Button
               size="sm"
               className="bg-button-bg hover:bg-button-hover"
@@ -321,7 +332,7 @@ export default function UsersPage() {
             </Button>
           )}
           {/* All admins can add USER */}
-          {CURRENT_USER_ROLE === "ADMIN" && (
+          {/* {currentUserRole == "ADMIN" && (
             <Button
               size="sm"
               className="bg-button-bg hover:bg-button-hover"
@@ -330,7 +341,7 @@ export default function UsersPage() {
               <Plus className="mr-2 h-4 w-4" />
               {t("addUser")}
             </Button>
-          )}
+          )} */}
         </div>
       </div>
 
