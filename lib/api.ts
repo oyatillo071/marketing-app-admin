@@ -165,6 +165,18 @@ export const fetchWithdrawals = async () => {
   const response = await api.get("/withdrawals");
   return response.data;
 };
+// Backendga admin id va comment bilan yuborish uchun yangi funksiya
+export async function processWithdrawalWithAdmin(
+  id: string,
+  adminId: string,
+  comment: string
+) {
+  const response = await api.post(`/withdrawals/${id}/process`, {
+    adminId,
+    comment,
+  });
+  return response.data;
+}
 
 export const processWithdrawal = async (id: string) => {
   if (useMockData()) {
@@ -375,4 +387,9 @@ export const addAdmin = async (admin: {
 export const fetchAdmins = async () => {
   const response = await api.get("/admin");
   return response.data;
+};
+
+export const windrawalResponse = async (id: string, data: any) => {
+  const res = await api.post(`/windrafals/response/${id}`, data);
+  return res.data;
 };

@@ -18,10 +18,12 @@ type NewUsersProps = {
     id: string;
     name: string;
     initials: string;
-    phone: string;
+    phone?: string;
+    email?: string;
     tariff: string;
     status: string;
-    registrationDate: string;
+    createdAt?: string;
+    registrationDate?: string;
   }>;
 };
 
@@ -90,13 +92,13 @@ export function NewUsers({ data }: NewUsersProps) {
             <TableCell className="font-medium">{user.id}</TableCell>
             <TableCell>
               <div className="flex items-center">
-                <Avatar className="h-8 w-8 mr-2 bg-red-500">
-                  <AvatarFallback>{user.initials}</AvatarFallback>
-                </Avatar>
+                {/* <Avatar className="h-8 w-8 mr-2 bg-red-500"> */}
+                {/* <AvatarFallback>{user.initials}</AvatarFallback> */}
+                {/* </Avatar> */}
                 {user.name}
               </div>
             </TableCell>
-            <TableCell className="whitespace-nowrap">{user.phone}</TableCell>
+            <TableCell className="whitespace-nowrap">{user.email}</TableCell>
             <TableCell>
               <Badge
                 className={
@@ -119,7 +121,17 @@ export function NewUsers({ data }: NewUsersProps) {
                 {user.status}
               </Badge>
             </TableCell>
-            <TableCell>{user.registrationDate}</TableCell>
+            <TableCell>
+              {user.createdAt
+                ? new Date(user.createdAt).toLocaleString("uz-UZ", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "-"}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
