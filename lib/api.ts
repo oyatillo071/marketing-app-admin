@@ -11,11 +11,26 @@ const api = axios.create({
   },
 });
 
-// Add auth token to requests
+// Add auth token to requests + mlm_user check
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (typeof window !== "undefined") {
+    // Login yoki register endpointlariga so‘rov yuborilsa, localStorage tekshirilmaydi
+    const isAuthRequest =
+      config.url?.includes("/authorization/login") ||
+      config.url?.includes("/authorization/register") ||
+      config.url?.includes("/auth/login") ||
+      config.url?.includes("/auth/register");
+
+    if (!isAuthRequest) {
+      if (!localStorage.getItem("mlm-data")) {
+        window.location.href = "/login";
+        return Promise.reject(new Error("Not authenticated"));
+      }
+      const token = localStorage.getItem("token");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
   }
   return config;
 });
@@ -66,7 +81,7 @@ export const loginUser = async (email: string, password: string) => {
   const response = await api.post("/authorization/login", { email, password });
   localStorage.setItem("token", response.data.token);
   localStorage.setItem("mlm-data", JSON.stringify(response.data.data));
-
+  localStorage.setItem("mlm_role", JSON.stringify(response.data.data.role));
   return response.data;
 };
 

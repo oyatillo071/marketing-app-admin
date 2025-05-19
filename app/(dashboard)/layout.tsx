@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 import type React from "react";
 import { Sidebar } from "@/components/sidebar";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -12,15 +12,15 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  useEffect(() => {
-    // This is a workaround for a known issue with the `use client` directive
-    // in Next.js. It ensures that the component is only rendered on the client side.
-    if (typeof window !== "undefined") {
-      if (!localStorage.getItem("mlm_user")) {
-        useRouter().push("/login");
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   // This is a workaround for a known issue with the `use client` directive
+  //   // in Next.js. It ensures that the component is only rendered on the client side.
+  //   if (typeof window !== "undefined") {
+  //     if (!localStorage.getItem("mlm_user")) {
+  //       useRouter().push("/login");
+  //     }
+  //   }
+  // }, []);
   return (
     <div className="min-h-screen bg-background">
       {/* Sidebar component */}

@@ -38,8 +38,7 @@ import {
 } from "@/components/ui/select";
 
 // You should get this from auth context or props in real app
-const CURRENT_USER_ROLE = "SUPERADMIN"; // or "ADMIN"
-
+const CURRENT_USER_ROLE = localStorage.getItem("mlm_role") || "admin";
 export default function UsersPage() {
   const { t } = useLanguage();
   const [users, setUsers] = useState([]);
@@ -310,7 +309,7 @@ export default function UsersPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {/* Only SUPERADMIN can add ADMIN */}
+          {/* Only SUPERADMIN can add ADMIN or SUPERADMIN */}
           {CURRENT_USER_ROLE === "SUPERADMIN" && (
             <Button
               size="sm"
@@ -470,111 +469,109 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* Add Admin Dialog: Only for SUPERADMIN */}
-      {CURRENT_USER_ROLE === "SUPERADMIN" && (
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{t("addAdmin")}</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleAddUser}>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    {t("name")}
-                  </Label>
-                  <Input
-                    id="name"
-                    value={newUser.name}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, name: e.target.value })
-                    }
-                    className="col-span-3"
-                    required
-                  />
-                </div>
-                {errors.name && (
-                  <div className="col-span-4 text-red-500 text-xs ml-2">
-                    {errors.name}
-                  </div>
-                )}
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">
-                    {t("email")}
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={newUser.email}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, email: e.target.value })
-                    }
-                    className="col-span-3"
-                    required
-                  />
-                </div>
-                {errors.email && (
-                  <div className="col-span-4 text-red-500 text-xs ml-2">
-                    {errors.email}
-                  </div>
-                )}
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="role" className="text-right">
-                    {t("role")}
-                  </Label>
-                  <select
-                    id="role"
-                    value={newUser.role}
-                    onChange={(e) =>
-                      setNewUser({
-                        ...newUser,
-                        role: e.target.value.toUpperCase(),
-                      })
-                    }
-                    className="col-span-3 rounded-md border px-3 py-2 text-sm"
-                    required
-                  >
-                    <option value="ADMIN">{t("admin")}</option>
-                    {/* <option value="SUPERADMIN">{t("superadmin")}</option> */}
-                  </select>
-                </div>
-                {errors.role && (
-                  <div className="col-span-4 text-red-500 text-xs ml-2">
-                    {errors.role}
-                  </div>
-                )}
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="password" className="text-right">
-                    {t("password")}
-                  </Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    minLength={8}
-                    maxLength={22}
-                    value={newUser.password || ""}
-                    onChange={(e) =>
-                      setNewUser({ ...newUser, password: e.target.value })
-                    }
-                    className="col-span-3"
-                    required
-                  />
-                </div>
-                {errors.password && (
-                  <div className="col-span-4 text-red-500 text-xs ml-2">
-                    {errors.password}
-                  </div>
-                )}
+      {/* Add User/Admin Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("addAdmin")}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleAddUser}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  {t("name")}
+                </Label>
+                <Input
+                  id="name"
+                  value={newUser.name}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, name: e.target.value })
+                  }
+                  className="col-span-3"
+                  required
+                />
               </div>
-              <DialogFooter>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? t("loading") : t("save")}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-      )}
+              {errors.name && (
+                <div className="col-span-4 text-red-500 text-xs ml-2">
+                  {errors.name}
+                </div>
+              )}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="email" className="text-right">
+                  {t("email")}
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, email: e.target.value })
+                  }
+                  className="col-span-3"
+                  required
+                />
+              </div>
+              {errors.email && (
+                <div className="col-span-4 text-red-500 text-xs ml-2">
+                  {errors.email}
+                </div>
+              )}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="role" className="text-right">
+                  {t("role")}
+                </Label>
+                <select
+                  id="role"
+                  value={newUser.role}
+                  onChange={(e) =>
+                    setNewUser({
+                      ...newUser,
+                      role: e.target.value.toUpperCase(),
+                    })
+                  }
+                  className="col-span-3 rounded-md border px-3 py-2 text-sm"
+                  required
+                >
+                  <option value="ADMIN">{t("admin")}</option>
+                  {/* <option value="SUPERADMIN">{t("superadmin")}</option> */}
+                </select>
+              </div>
+              {errors.role && (
+                <div className="col-span-4 text-red-500 text-xs ml-2">
+                  {errors.role}
+                </div>
+              )}
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="password" className="text-right">
+                  {t("password")}
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  minLength={8}
+                  maxLength={22}
+                  value={newUser.password || ""}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, password: e.target.value })
+                  }
+                  className="col-span-3"
+                  required
+                />
+              </div>
+              {errors.password && (
+                <div className="col-span-4 text-red-500 text-xs ml-2">
+                  {errors.password}
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? t("loading") : t("save")}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
