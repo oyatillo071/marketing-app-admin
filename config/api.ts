@@ -1,1 +1,1 @@
-export const API_CONFIG = http://164.68.120.136:2255/
+export const API_CONFIG = "http://164.68.120.136:2255" 
