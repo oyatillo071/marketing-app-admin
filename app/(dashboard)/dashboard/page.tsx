@@ -58,11 +58,11 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {statistics?.userStats.total}
+                  {statistics?.userStats?.total}
                 </div>
                 <p className="text-xs text-muted-foreground">{t("allUsers")}</p>
                 <div className="text-sm font-medium text-green-500 mt-2">
-                  +{statistics?.userStats.growth}% {t("comparedToLastMonth")}
+                  +{statistics?.userStats?.growth}% {t("comparedToLastMonth")}
                 </div>
               </CardContent>
             </Card>
@@ -75,11 +75,12 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  ${statistics?.revenueStats.total.toLocaleString()}
+                  ${statistics?.revenueStats?.total.toLocaleString()}
                 </div>
                 <p className="text-xs text-muted-foreground">{t("allTime")}</p>
                 <div className="text-sm font-medium text-green-500 mt-2">
-                  +{statistics?.revenueStats.growth}% {t("comparedToLastMonth")}
+                  +{statistics?.revenueStats?.growth}%{" "}
+                  {t("comparedToLastMonth")}
                 </div>
               </CardContent>
             </Card>
@@ -92,13 +93,13 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {statistics?.tariffStats.total}
+                  {statistics?.tariffStats?.total}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {t("currentlyActiveTariffs")}
                 </p>
                 <div className="text-sm font-medium text-green-500 mt-2">
-                  +{statistics?.tariffStats.growth}% {t("comparedToLastMonth")}
+                  +{statistics?.tariffStats?.growth}% {t("comparedToLastMonth")}
                 </div>
               </CardContent>
             </Card>
@@ -111,13 +112,13 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {statistics?.withdrawalStats.pending}
+                  {statistics?.withdrawalStats?.pending}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {t("withdrawalRequests")}
                 </p>
                 <div className="text-sm font-medium text-red-500 mt-2">
-                  {statistics?.withdrawalStats.growth}%{" "}
+                  {statistics?.withdrawalStats?.growth}%{" "}
                   {t("comparedToLastMonth")}
                 </div>
               </CardContent>

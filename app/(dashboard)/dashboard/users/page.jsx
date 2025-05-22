@@ -28,7 +28,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import {
   Select,
   SelectTrigger,
@@ -145,14 +145,10 @@ export default function UsersPage() {
   const handleUpdateUser = async (id, data) => {
     try {
       await updateUser(id, data);
-      toast({ title: t("success"), description: t("userUpdated") });
+      toast.success(t("userUpdated"));
       loadUsers();
     } catch {
-      toast({
-        title: t("error"),
-        description: t("errorOccurred"),
-        variant: "destructive",
-      });
+      toast.error(t("errorOccurred"));
     }
   };
 
@@ -160,14 +156,10 @@ export default function UsersPage() {
   const handleDeleteUser = async (id) => {
     try {
       await deleteUser(id);
-      toast({ title: t("success"), description: t("userDeleted") });
+      toast.success(t("userDeleted"));
       loadUsers();
     } catch {
-      toast({
-        title: t("error"),
-        description: t("errorOccurred"),
-        variant: "destructive",
-      });
+      toast.error(t("errorOccurred"));
     }
   };
 
@@ -175,14 +167,10 @@ export default function UsersPage() {
   const handleBlockUser = async (id) => {
     try {
       await blockUser(id);
-      toast({ title: t("success"), description: t("userBlocked") });
+      toast.success(t("userBlocked"));
       loadUsers();
     } catch {
-      toast({
-        title: t("error"),
-        description: t("errorOccurred"),
-        variant: "destructive",
-      });
+      toast.error(t("errorOccurred"));
     }
   };
 
@@ -190,14 +178,10 @@ export default function UsersPage() {
   const handleUnblockUser = async (id) => {
     try {
       await unblockUser(id);
-      toast({ title: t("success"), description: t("userUnblocked") });
+      toast.success(t("userUnblocked"));
       loadUsers();
     } catch {
-      toast({
-        title: t("error"),
-        description: t("errorOccurred"),
-        variant: "destructive",
-      });
+      toast.error(t("errorOccurred"));
     }
   };
 
@@ -249,27 +233,16 @@ export default function UsersPage() {
 
     try {
       if (currentUserRole === "SUPERADMIN") {
-        // SUPERADMIN qo'shishni bloklash (lekin kodi bor)
         if (userToAdd.role === "SUPERADMIN") {
-          // Kod bor, lekin ishlamaydi:
-          // await addAdmin(userToAdd);
-          // toast({ title: t("success"), description: t("adminAdded") });
-          toast({
-            title: t("error"),
-            description:
-              t("superadminAddNotAllowed") ||
-              "SUPERADMIN qo'shish mumkin emas.",
-            variant: "destructive",
-          });
+          toast.error(
+            t("superadminAddNotAllowed") || "SUPERADMIN qo'shish mumkin emas."
+          );
         } else {
           await addAdmin(userToAdd);
-          toast({ title: t("success"), description: t("adminAdded") });
+          toast.success(t("adminAdded"));
         }
       } else {
-        toast({
-          title: t("info"),
-          description: t("userAddNotSupported") || "User add is not supported.",
-        });
+        toast.info(t("userAddNotSupported") || "User add is not supported.");
       }
       setNewUser({
         name: "",
@@ -281,11 +254,7 @@ export default function UsersPage() {
       loadUsers();
       setErrors({});
     } catch (error) {
-      toast({
-        title: t("error"),
-        description: error?.response?.data?.message || error.message,
-        variant: "destructive",
-      });
+      toast.error(error?.response?.data?.message || error.message);
     } finally {
       setIsSubmitting(false);
     }

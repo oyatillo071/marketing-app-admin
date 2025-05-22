@@ -129,7 +129,7 @@ export default function ProductsPage() {
     const payload = {
       term: Number(form.term),
       referral_bonus: Number(form.referral_bonus),
-      photo_url, // bu yerda har doim to‘liq URL yoki bo‘sh string bo‘lishi kerak
+      photo_url: [photo_url], // bu yerda har doim to‘liq URL yoki bo‘sh string bo‘lishi kerak
       translations: form.translations,
       prices: form.prices.map((p) => ({ ...p, value: Number(p.value) })),
     };

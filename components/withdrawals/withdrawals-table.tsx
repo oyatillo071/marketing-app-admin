@@ -120,7 +120,7 @@ export function WithdrawalsTable() {
   const [processingId, setProcessingId] = React.useState<string | null>(null);
 
   // Get user from localStorage
-  const getUserFromLocalStorage = React.useCallback((): User | null => {
+  function getUserFromLocalStorage(): User | null {
     if (typeof window !== "undefined") {
       const userStr = localStorage.getItem("user");
       if (userStr) {
@@ -132,12 +132,13 @@ export function WithdrawalsTable() {
       }
     }
     return null;
-  }, []);
+  }
 
-  const user = React.useMemo(
-    () => getUserFromLocalStorage(),
-    [getUserFromLocalStorage]
-  );
+  const [user, setUser] = React.useState<User | null>(null);
+
+  React.useEffect(() => {
+    setUser(getUserFromLocalStorage());
+  }, []); // Faqat bir marta ishlaydi
 
   // Filter data based on search term and status filter
   React.useEffect(() => {

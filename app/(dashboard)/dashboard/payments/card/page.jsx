@@ -80,18 +80,18 @@ export default function CardsSection() {
   //   return Object.keys(errs).length === 0;
   // }, [form, t]);
   // Form validation
-const validate = useCallback(() => {
-  const errs = {};
-  // Bo'sh joylarni olib tashlash orqali validatsiya
-  const rawCardNumber = form.card_seria_number.replace(/\s/g, '');
-  if (!rawCardNumber.match(/^\d{9,}$/))
-    errs.card_seria_number = t("invalidCardNumber");
-  if (!form.cauntries && !form.custom_country)
-    errs.cauntries = t("selectCountry");
-  if (!form.card_type && !form.custom_type) errs.card_type = t("selectType");
-  setErrors(errs);
-  return Object.keys(errs).length === 0;
-}, [form, t]);
+  const validate = useCallback(() => {
+    const errs = {};
+    // Bo'sh joylarni olib tashlash orqali validatsiya
+    const rawCardNumber = form.card_seria_number.replace(/\s/g, "");
+    if (!rawCardNumber.match(/^\d{9,}$/))
+      errs.card_seria_number = t("invalidCardNumber");
+    if (!form.cauntries && !form.custom_country)
+      errs.cauntries = t("selectCountry");
+    if (!form.card_type && !form.custom_type) errs.card_type = t("selectType");
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  }, [form, t]);
 
   // Handle form submit
   const handleSubmit = useCallback(
@@ -99,9 +99,9 @@ const validate = useCallback(() => {
       e.preventDefault();
       if (!validate()) return;
       await addCard({
-        card_seria_number: form.card_seria_number,
-        cauntries: form.cauntries || form.custom_country,
-        card_type: form.card_type || form.custom_type,
+        card_seria_number: String(form.card_seria_number.replace(/\s/g, "")),
+        country: String(form.cauntries || form.custom_country),
+        card_type: String(form.card_type || form.custom_type),
       });
       setForm({
         card_seria_number: "",

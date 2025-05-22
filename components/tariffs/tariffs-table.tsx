@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState, useMemo } from "react";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -11,10 +11,18 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+} from "@tanstack/react-table";
+import {
+  ArrowUpDown,
+  MoreHorizontal,
+  Eye,
+  Edit,
+  Trash2,
+  Check,
+  X,
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,72 +30,159 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { useTariffs } from "@/hooks/use-tariffs"
-import { useLanguage } from "@/contexts/language-context"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { useTariffs } from "@/hooks/use-tariffs";
+import { useLanguage } from "@/contexts/language-context";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TariffDetailsDialog } from "./tariff-details-dialog";
+import { TariffFormDialog } from "./tariff-form-dialog";
+import { Input } from "@/components/ui/input";
 
 export function TariffsTable() {
-  const { t } = useLanguage()
-  const { data: tariffs, isLoading, updateTariff, deleteTariff } = useTariffs()
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [currentTariff, setCurrentTariff] = useState<any>(null)
+  const { t, language } = useLanguage();
+  const {
+    data: tariffsRaw,
+    isLoading,
+    updateTariff,
+    deleteTariff,
+    createTariff,
+  } = useTariffs();
+
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [currentTariff, setCurrentTariff] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Tariffs mapping: API response -> table row
+  const tariffs = useMemo(() => {
+    if (!tariffsRaw) return [];
+
+    // Language to currency mapping
+    const languageToCurrency: Record<string, string> = {
+      uz: "UZS",
+      ru: "RUB",
+      en: "USD",
+      kz: "KZT",
+      kg: "KGS",
+      tj: "TJS",
+      cn: "CNY",
+    };
+
+    // Default currency based on language
+    const preferredCurrency = languageToCurrency[language] || "UZS";
+
+    return tariffsRaw.map((tariff: any) => {
+      // Get translation for current language
+      const translation =
+        tariff.translations?.find((tr: any) => tr.language === language) ||
+        tariff.translations?.[0] ||
+        {};
+
+      // Get price for preferred currency or default to first price
+      const price =
+        tariff.prices?.find((p: any) => p.currency === preferredCurrency) ||
+        tariff.prices?.[0];
+
+      return {
+        id: tariff.id,
+        name: translation.name || "null",
+        description: translation.description || "-",
+        price: price ? `${price.value} ${price.currency}` : "-",
+        status: tariff.status || "Faol",
+        term: tariff.term,
+        referral_bonus: tariff.referral_bonus,
+        createdAt: tariff.createdAt,
+        photo_url: tariff.photo_url,
+        // Store the full object for details view
+        _original: tariff,
+      };
+    });
+  }, [tariffsRaw, language]);
+
+  // Filter tariffs based on search query
+  const filteredTariffs = useMemo(() => {
+    if (!searchQuery.trim()) return tariffs;
+
+    const query = searchQuery.toLowerCase();
+    return tariffs.filter(
+      (tariff: any) =>
+        tariff.name.toLowerCase().includes(query) ||
+        tariff.description.toLowerCase().includes(query) ||
+        tariff.price.toLowerCase().includes(query) ||
+        String(tariff.term).includes(query)
+    );
+  }, [tariffs, searchQuery]);
 
   // Define the columns
   const columns: ColumnDef<any>[] = [
     {
       accessorKey: "id",
       header: t("id"),
-      cell: ({ row }) => <div className="font-medium">{row.getValue("id")}</div>,
+      cell: ({ row }) => (
+        <div className="font-medium">{row.getValue("id")}</div>
+      ),
     },
     {
       accessorKey: "name",
-      header: ({ column }) => {
-        return (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            {t("name")}
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          {t("name")}
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
     },
     {
       accessorKey: "price",
       header: t("price"),
-      cell: ({ row }) => {
-        const price = Number.parseFloat(row.getValue("price"))
-        const formatted = new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: "USD",
-        }).format(price)
-        return <div>{formatted}</div>
-      },
+      cell: ({ row }) => (
+        <div className="font-medium">{row.getValue("price")}</div>
+      ),
     },
     {
-      accessorKey: "description",
-      header: t("description"),
+      accessorKey: "term",
+      header: t("term"),
+      cell: ({ row }) => (
+        <div>
+          {row.getValue("term")} {t("days")}
+        </div>
+      ),
     },
     {
       accessorKey: "status",
       header: t("status"),
       cell: ({ row }) => {
-        const status = row.getValue("status") as string
-        return <Badge className={status === "Faol" ? "bg-green-500" : "bg-red-500"}>{status}</Badge>
+        const status = row.getValue("status") as string;
+        return (
+          <Badge className={status === "Faol" ? "bg-green-500" : "bg-red-500"}>
+            {status === "Faol" ? (
+              <Check className="h-3 w-3 mr-1" />
+            ) : (
+              <X className="h-3 w-3 mr-1" />
+            )}
+            {status}
+          </Badge>
+        );
       },
     },
     {
       id: "actions",
       header: t("actions"),
       cell: ({ row }) => {
-        const tariff = row.original
+        const tariff = row.original;
 
         return (
           <DropdownMenu>
@@ -99,42 +194,67 @@ export function TariffsTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>{t("actions")}</DropdownMenuLabel>
+
               <DropdownMenuItem
                 onClick={() => {
-                  setCurrentTariff(tariff)
-                  setIsEditDialogOpen(true)
+                  setCurrentTariff(tariff._original);
+                  setDetailsOpen(true);
                 }}
               >
+                <Eye className="h-4 w-4 mr-2" />
+                {t("view")}
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => {
+                  setCurrentTariff(tariff._original);
+                  setFormOpen(true);
+                }}
+              >
+                <Edit className="h-4 w-4 mr-2" />
                 {t("edit")}
               </DropdownMenuItem>
+
               <DropdownMenuItem
                 onClick={() => {
-                  const newStatus = tariff.status === "Faol" ? "Nofaol" : "Faol"
-                  updateTariff(tariff.id, { ...tariff, status: newStatus })
+                  const newStatus =
+                    tariff.status === "Faol" ? "Nofaol" : "Faol";
+                  updateTariff(tariff.id, {
+                    ...tariff._original,
+                    status: newStatus,
+                  });
                 }}
               >
+                {tariff.status === "Faol" ? (
+                  <X className="h-4 w-4 mr-2" />
+                ) : (
+                  <Check className="h-4 w-4 mr-2" />
+                )}
                 {tariff.status === "Faol" ? t("deactivate") : t("activate")}
               </DropdownMenuItem>
+
               <DropdownMenuSeparator />
+
               <DropdownMenuItem
-                className="text-red-500"
+                className="text-red-500 focus:text-red-500"
                 onClick={() => {
                   if (confirm(t("confirmDeleteMessage"))) {
-                    deleteTariff(tariff.id)
+                    deleteTariff(tariff.id);
                   }
                 }}
               >
+                <Trash2 className="h-4 w-4 mr-2" />
                 {t("delete")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
       },
     },
-  ]
+  ];
 
   const table = useReactTable({
-    data: tariffs,
+    data: filteredTariffs,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -146,12 +266,18 @@ export function TariffsTable() {
       sorting,
       columnFilters,
     },
-  })
+  });
 
-  const handleSaveTariff = () => {
-    updateTariff(currentTariff.id, currentTariff)
-    setIsEditDialogOpen(false)
-  }
+  const handleFormSubmit = (data: any) => {
+    if (currentTariff) {
+      // Update existing tariff
+      updateTariff(currentTariff.id, data);
+    } else {
+      // Create new tariff
+      createTariff(data);
+    }
+    setFormOpen(false);
+  };
 
   if (isLoading) {
     return (
@@ -161,7 +287,11 @@ export function TariffsTable() {
             <TableHeader>
               <TableRow>
                 {columns.map((column, i) => (
-                  <TableHead key={i}>{typeof column.header === "string" ? column.header : t("column")}</TableHead>
+                  <TableHead key={i}>
+                    {typeof column.header === "string"
+                      ? column.header
+                      : t("column")}
+                  </TableHead>
                 ))}
               </TableRow>
             </TableHeader>
@@ -179,11 +309,32 @@ export function TariffsTable() {
           </Table>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="max-w-sm">
+          <Input
+            placeholder={t("searchTariffs")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="max-w-sm"
+          />
+        </div>
+        {/* 
+        <Button
+          onClick={() => {
+            setCurrentTariff(null);
+            setFormOpen(true);
+          }}
+          size="sm"
+        >
+          {t("addTariff")}
+        </Button> */}
+      </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -192,9 +343,14 @@ export function TariffsTable() {
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -202,15 +358,31 @@ export function TariffsTable() {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="cursor-pointer"
+                  onClick={() => {
+                    setCurrentTariff(row.original._original);
+                    setDetailsOpen(true);
+                  }}
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   {t("noDataFound")}
                 </TableCell>
               </TableRow>
@@ -218,66 +390,40 @@ export function TariffsTable() {
           </TableBody>
         </Table>
       </div>
+
       <div className="flex items-center justify-end space-x-2 py-4">
-        <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
           {t("previous")}
         </Button>
-        <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
           {t("next")}
         </Button>
       </div>
 
-      {currentTariff && (
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {t("edit")} {t("tariff")}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-name" className="text-right">
-                  {t("name")}
-                </Label>
-                <Input
-                  id="edit-name"
-                  value={currentTariff.name}
-                  onChange={(e) => setCurrentTariff({ ...currentTariff, name: e.target.value })}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-price" className="text-right">
-                  {t("price")}
-                </Label>
-                <Input
-                  id="edit-price"
-                  type="number"
-                  step="0.01"
-                  value={currentTariff.price}
-                  onChange={(e) => setCurrentTariff({ ...currentTariff, price: Number(e.target.value) })}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-description" className="text-right">
-                  {t("description")}
-                </Label>
-                <Textarea
-                  id="edit-description"
-                  value={currentTariff.description}
-                  onChange={(e) => setCurrentTariff({ ...currentTariff, description: e.target.value })}
-                  className="col-span-3"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button onClick={handleSaveTariff}>{t("save")}</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
+      {/* Details Dialog */}
+      <TariffDetailsDialog
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+        tariff={currentTariff}
+      />
+
+      {/* Form Dialog */}
+      <TariffFormDialog
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        tariff={currentTariff}
+        onSubmit={handleFormSubmit}
+      />
     </div>
-  )
+  );
 }

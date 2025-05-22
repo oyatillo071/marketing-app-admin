@@ -178,7 +178,7 @@ export const unblockUser = async (id: string) => {
 
 // Payments
 export const fetchPayments = async () => {
-  if (useMockData()) {
+  if (true) {
     await new Promise((resolve) => setTimeout(resolve, 500));
     return mockData.payments;
   }
@@ -189,12 +189,12 @@ export const fetchPayments = async () => {
 
 // Withdrawals
 export const fetchWithdrawals = async () => {
-  if (useMockData()) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return mockData.withdrawals;
-  }
+  // if (useMockData()) {
+  //   await new Promise((resolve) => setTimeout(resolve, 500));
+  //   return mockData.withdrawals;
+  // }
 
-  const response = await api.get("/withdrawals");
+  const response = await api.get("/payments");
   return response.data;
 };
 // Backendga admin id va comment bilan yuborish uchun yangi funksiya
@@ -203,7 +203,7 @@ export async function processWithdrawalWithAdmin(
   adminId: string,
   comment: string
 ) {
-  const response = await api.post(`/withdrawals/${id}/process`, {
+  const response = await api.post(`/payments/${id}/process`, {
     adminId,
     comment,
   });
@@ -216,7 +216,7 @@ export const processWithdrawal = async (id: string) => {
     return { id, status: "To'langan", processedAt: new Date().toISOString() };
   }
 
-  const response = await api.post(`/withdrawals/${id}/process`);
+  const response = await api.post(`/payments/${id}/process`);
   return response.data;
 };
 
@@ -231,13 +231,13 @@ export const rejectWithdrawal = async (id: string, reason: string) => {
     };
   }
 
-  const response = await api.post(`/withdrawals/${id}/reject`, { reason });
+  const response = await api.post(`/payments/${id}/reject`, { reason });
   return response.data;
 };
 
 // Tariffs
 export const fetchTariffs = async () => {
-  const response = await api.get("/tariffs");
+  const response = await api.get("/tariff");
   return response.data;
 };
 
@@ -251,27 +251,17 @@ export const createTariff = async (data: any) => {
     };
   }
 
-  const response = await api.post("/tariffs", data);
+  const response = await api.post("/tariff/add", data);
   return response.data;
 };
 
 export const updateTariff = async (id: string, data: any) => {
-  if (useMockData()) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return { ...data, id };
-  }
-
-  const response = await api.put(`/tariffs/${id}`, data);
+  const response = await api.put(`/tariff/update/${id}`, data);
   return response.data;
 };
 
 export const deleteTariff = async (id: string) => {
-  if (useMockData()) {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return { success: true };
-  }
-
-  const response = await api.delete(`/tariffs/${id}`);
+  const response = await api.delete(`/tariff/${id}`);
   return response.data;
 };
 
@@ -301,20 +291,31 @@ export const sendNotification = async (data: any) => {
   return response.data;
 };
 
-// Statistics
+// Statistikaga CRUD funksiyalari
 export const fetchStatistics = async () => {
-  if (useMockData()) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return mockData.statistics;
-  }
+  const response = await api.get("/statistika");
+  return response.data || {};
+};
 
-  const response = await api.get("/statistics");
+export const createStatistics = async (data: any) => {
+  const response = await api.post("/statistika", data);
+
+  return response.data;
+};
+
+export const updateStatistics = async (id: string, data: any) => {
+  const response = await api.put(`/statistika/${id}`, data);
+  return response.data;
+};
+
+export const deleteStatistics = async (id: string) => {
+  const response = await api.delete(`/statistika/${id}`);
   return response.data;
 };
 
 // Settings
 export const fetchSettings = async () => {
-  if (useMockData()) {
+  if (true) {
     await new Promise((resolve) => setTimeout(resolve, 300));
     return mockData.settings;
   }
