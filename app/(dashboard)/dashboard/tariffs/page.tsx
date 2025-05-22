@@ -42,21 +42,26 @@ export default function TariffsPage() {
     const stats = {
       summary: {
         totalTariffs: tariffs.length || 0,
-        activeTariffs: tariffs.filter((t) => t.status === "Faol").length || 0,
-        inactiveTariffs: tariffs.filter((t) => t.status !== "Faol").length || 0,
+        activeTariffs:
+          tariffs.filter((t: any) => t.status === "Faol").length || 0,
+        inactiveTariffs:
+          tariffs.filter((t: any) => t.status !== "Faol").length || 0,
         averagePrice: tariffs.length
           ? (
-              tariffs.reduce((sum, t) => sum + (t.prices?.[0]?.value || 0), 0) /
-              tariffs.length
+              tariffs.reduce(
+                (sum: any, t: any) => sum + (t.prices?.[0]?.value || 0),
+                0
+              ) / tariffs.length
             ).toFixed(2)
           : 0,
       },
       distribution: {
         byTerm: {
-          "30 days or less": tariffs.filter((t) => t.term <= 30).length || 0,
+          "30 days or less":
+            tariffs.filter((t: any) => t.term <= 30).length || 0,
           "31-90 days":
-            tariffs.filter((t) => t.term > 30 && t.term <= 90).length || 0,
-          "91+ days": tariffs.filter((t) => t.term > 90).length || 0,
+            tariffs.filter((t: any) => t.term > 30 && t.term <= 90).length || 0,
+          "91+ days": tariffs.filter((t: any) => t.term > 90).length || 0,
         },
       },
     };
@@ -121,6 +126,7 @@ export default function TariffsPage() {
       <TariffFormDialog
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
+        tariff={null}
         onSubmit={handleAddTariff}
       />
     </div>

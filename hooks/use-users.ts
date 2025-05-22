@@ -1,11 +1,12 @@
-"use client"
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { fetchUsers, fetchUserById, updateUser, deleteUser } from "@/lib/api"
-import { toast } from "@/components/ui/use-toast"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchUsers, fetchUserById, updateUser, deleteUser } from "@/lib/api";
+import { toast } from "sonner";
+// import { toast } from "@/components/ui/use-toast";
 
 export function useUsers() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const {
     data = [],
@@ -14,57 +15,46 @@ export function useUsers() {
   } = useQuery({
     queryKey: ["users"],
     queryFn: fetchUsers,
-  })
+  });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => updateUser(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      updateUser(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] })
-      toast({
-        title: "Foydalanuvchi yangilandi",
-        description: "Foydalanuvchi ma'lumotlari muvaffaqiyatli yangilandi.",
-      })
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.info("Foydalanuvchi yangilandi");
     },
     onError: (error: any) => {
-      toast({
-        title: "Xatolik yuz berdi",
-        description: error.message || "Foydalanuvchini yangilashda xatolik yuz berdi.",
-        variant: "destructive",
-      })
+      toast(error.message || "Foydalanuvchini yangilashda xatolik yuz berdi.");
     },
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: deleteUser,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] })
-      toast({
-        title: "Foydalanuvchi o'chirildi",
-        description: "Foydalanuvchi muvaffaqiyatli o'chirildi.",
-      })
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("Foydalanuvchi muvaffaqiyatli o'chirildi.");
     },
     onError: (error: any) => {
-      toast({
-        title: "Xatolik yuz berdi",
-        description: error.message || "Foydalanuvchini o'chirishda xatolik yuz berdi.",
-        variant: "destructive",
-      })
+      toast.error(
+        error.message || "Foydalanuvchini o'chirishda xatolik yuz berdi."
+      );
     },
-  })
+  });
 
   return {
     data,
     isLoading,
     error,
     updateUser: (id: string, data: any) => updateMutation.mutate({ id, data }),
-    deleteUser: (id: string) => deleteMutation.mutate(id),
-  }
+    deleteUser: (id: any) => deleteMutation.mutate(id),
+  };
 }
 
-export function useUser(id: string) {
+export function useUser(id: string | any) {
   return useQuery({
     queryKey: ["users", id],
     queryFn: () => fetchUserById(id),
     enabled: !!id,
-  })
+  });
 }

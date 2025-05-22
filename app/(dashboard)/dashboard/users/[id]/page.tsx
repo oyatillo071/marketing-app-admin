@@ -1,18 +1,25 @@
-"use client"
+"use client";
 
-import { useUser } from "@/hooks/use-users"
-import { useLanguage } from "@/contexts/language-context"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Skeleton } from "@/components/ui/skeleton"
-import { ArrowLeft, Download, Edit, Trash } from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { exportToPDF } from "@/lib/pdf-export"
-import { useState, useEffect } from "react"
+import { useUser } from "@/hooks/use-users";
+import { useLanguage } from "@/contexts/language-context";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowLeft, Download, Edit, Trash } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { exportToPDF } from "@/lib/pdf-export";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,40 +27,57 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from "@/components/ui/dialog"
-import { useUsers } from "@/hooks/use-users"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { usePayments } from "@/hooks/use-payments"
-import { useWithdrawals } from "@/hooks/use-withdrawals"
+} from "@/components/ui/dialog";
+import { useUsers } from "@/hooks/use-users";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { usePayments } from "@/hooks/use-payments";
+import { useWithdrawals } from "@/hooks/use-withdrawals";
+import { usePathname } from "next/navigation";
+export default function UserDetailPage() {
+  const pathname = usePathname();
+  const segments = pathname?.split("/") ?? [];
+  const id: string | undefined =
+    segments.length > 0 ? segments[segments.length - 1] : undefined;
+  console.log(id);
 
-export default function UserDetailPage({ params }: { params: { id: string } }) {
-  const { t } = useLanguage()
-  const router = useRouter()
-  const { data: user, isLoading } = useUser(params.id)
-  const { deleteUser } = useUsers()
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const { data: allPayments } = usePayments()
-  const { data: allWithdrawals } = useWithdrawals()
-  const [userPayments, setUserPayments] = useState<any[]>([])
-  const [userWithdrawals, setUserWithdrawals] = useState<any[]>([])
+  const { t } = useLanguage();
+  const router = useRouter();
+  const { data: user, isLoading } = useUser(id);
+  const { deleteUser } = useUsers();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { data: allPayments } = usePayments();
+  const { data: allWithdrawals } = useWithdrawals();
+  const [userPayments, setUserPayments] = useState<any[]>([]);
+  const [userWithdrawals, setUserWithdrawals] = useState<any[]>([]);
 
   useEffect(() => {
     if (allPayments && user) {
-      const filteredPayments = allPayments.filter((payment) => payment.userId === user.id)
-      setUserPayments(filteredPayments)
+      const filteredPayments = allPayments.filter(
+        (payment: any) => payment.userId === user.id
+      );
+      setUserPayments(filteredPayments);
     }
-  }, [allPayments, user])
+  }, [allPayments, user]);
 
   useEffect(() => {
     if (allWithdrawals && user) {
-      const filteredWithdrawals = allWithdrawals.filter((withdrawal) => withdrawal.userId === user.id)
-      setUserWithdrawals(filteredWithdrawals)
+      const filteredWithdrawals = allWithdrawals.filter(
+        (withdrawal: any) => withdrawal.userId === user.id
+      );
+      setUserWithdrawals(filteredWithdrawals);
     }
-  }, [allWithdrawals, user])
+  }, [allWithdrawals, user]);
 
   const handleExportUserData = () => {
     if (user) {
-      const userData = [user]
+      const userData = [user];
       const columns = [
         { header: t("id"), accessor: "id" },
         { header: t("name"), accessor: "name" },
@@ -63,10 +87,15 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
         { header: t("status"), accessor: "status" },
         { header: t("balance"), accessor: "balance" },
         { header: t("registrationDate"), accessor: "registrationDate" },
-      ]
-      exportToPDF(userData, columns, `${t("userDetails")}: ${user.name}`, `user-${user.id}-export`)
+      ];
+      exportToPDF(
+        userData,
+        columns,
+        `${t("userDetails")}: ${user.name}`,
+        `user-${user.id}-export`
+      );
     }
-  }
+  };
 
   const handleExportPayments = () => {
     if (userPayments.length > 0) {
@@ -75,10 +104,15 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
         { header: t("amount"), accessor: "amount" },
         { header: t("status"), accessor: "status" },
         { header: t("date"), accessor: "date" },
-      ]
-      exportToPDF(userPayments, columns, `${t("paymentHistory")}: ${user?.name}`, `payments-${user?.id}-export`)
+      ];
+      exportToPDF(
+        userPayments,
+        columns,
+        `${t("paymentHistory")}: ${user?.name}`,
+        `payments-${user?.id}-export`
+      );
     }
-  }
+  };
 
   const handleExportWithdrawals = () => {
     if (userWithdrawals.length > 0) {
@@ -88,21 +122,21 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
         { header: t("cardNumber"), accessor: "cardNumber" },
         { header: t("status"), accessor: "status" },
         { header: t("date"), accessor: "date" },
-      ]
+      ];
       exportToPDF(
         userWithdrawals,
         columns,
         `${t("withdrawalHistory")}: ${user?.name}`,
-        `withdrawals-${user?.id}-export`,
-      )
+        `withdrawals-${user?.id}-export`
+      );
     }
-  }
+  };
 
   const handleDeleteUser = () => {
-    deleteUser(params.id)
-    setIsDeleteDialogOpen(false)
-    router.push("/dashboard/users")
-  }
+    deleteUser(id);
+    setIsDeleteDialogOpen(false);
+    router.push("/dashboard/users");
+  };
 
   if (isLoading) {
     return (
@@ -146,7 +180,7 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
           </TabsContent>
         </Tabs>
       </div>
-    )
+    );
   }
 
   if (!user) {
@@ -160,13 +194,18 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
         </div>
         <div className="flex flex-col items-center justify-center h-[50vh]">
           <h2 className="text-2xl font-bold">{t("userNotFound")}</h2>
-          <p className="text-muted-foreground">{t("userNotFoundDescription")}</p>
-          <Button className="mt-4" onClick={() => router.push("/dashboard/users")}>
+          <p className="text-muted-foreground">
+            {t("userNotFoundDescription")}
+          </p>
+          <Button
+            className="mt-4"
+            onClick={() => router.push("/dashboard/users")}
+          >
             {t("backToUsers")}
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -184,7 +223,11 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
           </Avatar>
           <div>
             <h2 className="text-2xl font-bold">{user.name}</h2>
-            <Badge className={user.status === "Faol" ? "bg-green-500" : "bg-red-500"}>{user.status}</Badge>
+            <Badge
+              className={user.status === "Faol" ? "bg-green-500" : "bg-red-500"}
+            >
+              {user.status}
+            </Badge>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -194,7 +237,11 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
               {t("edit")}
             </Link>
           </Button>
-          <Button variant="destructive" size="sm" onClick={() => setIsDeleteDialogOpen(true)}>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
             <Trash className="mr-2 h-4 w-4" />
             {t("delete")}
           </Button>
@@ -231,8 +278,8 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
                         user.tariff === "Premium"
                           ? "bg-red-500"
                           : user.tariff === "Standard"
-                            ? "bg-green-500"
-                            : "bg-gray-500"
+                          ? "bg-green-500"
+                          : "bg-gray-500"
                       }
                     >
                       {user.tariff}
@@ -240,16 +287,26 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
                   </div>
                   <div className="font-medium">{t("status")}</div>
                   <div>
-                    <Badge className={user.status === "Faol" ? "bg-green-500" : "bg-red-500"}>{user.status}</Badge>
+                    <Badge
+                      className={
+                        user.isActive === "Faol" ? "bg-green-500" : "bg-red-500"
+                      }
+                    >
+                      {user.isActive}
+                    </Badge>
                   </div>
                   <div className="font-medium">{t("balance")}</div>
-                  <div>${user.balance.toFixed(2)}</div>
+                  <div>${user.balance}</div>
                   <div className="font-medium">{t("registrationDate")}</div>
                   <div>{user.registrationDate}</div>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button variant="outline" size="sm" onClick={handleExportUserData}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportUserData}
+                >
                   <Download className="mr-2 h-4 w-4" />
                   {t("exportUserData")}
                 </Button>
@@ -259,7 +316,9 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
             <Card>
               <CardHeader>
                 <CardTitle>{t("activitySummary")}</CardTitle>
-                <CardDescription>{t("activitySummaryDescription")}</CardDescription>
+                <CardDescription>
+                  {t("activitySummaryDescription")}
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
@@ -272,9 +331,19 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
                   <div className="font-medium">{t("totalWithdrawals")}</div>
                   <div>{userWithdrawals.length}</div>
                   <div className="font-medium">{t("totalSpent")}</div>
-                  <div>${userPayments.reduce((sum, p) => sum + p.amount, 0).toFixed(2)}</div>
+                  <div>
+                    $
+                    {userPayments
+                      .reduce((sum, p) => sum + p.amount, 0)
+                      .toFixed(2)}
+                  </div>
                   <div className="font-medium">{t("totalWithdrawn")}</div>
-                  <div>${userWithdrawals.reduce((sum, w) => sum + w.amount, 0).toFixed(2)}</div>
+                  <div>
+                    $
+                    {userWithdrawals
+                      .reduce((sum, w) => sum + w.amount, 0)
+                      .toFixed(2)}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -285,9 +354,16 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>{t("paymentHistory")}</CardTitle>
-                <CardDescription>{t("paymentHistoryDescription")}</CardDescription>
+                <CardDescription>
+                  {t("paymentHistoryDescription")}
+                </CardDescription>
               </div>
-              <Button variant="outline" size="sm" onClick={handleExportPayments} disabled={userPayments.length === 0}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportPayments}
+                disabled={userPayments.length === 0}
+              >
                 <Download className="mr-2 h-4 w-4" />
                 {t("downloadPDF")}
               </Button>
@@ -307,10 +383,14 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
                     <TableBody>
                       {userPayments.map((payment) => (
                         <TableRow key={payment.id}>
-                          <TableCell className="font-medium">{payment.id}</TableCell>
+                          <TableCell className="font-medium">
+                            {payment.id}
+                          </TableCell>
                           <TableCell>${payment.amount.toFixed(2)}</TableCell>
                           <TableCell>
-                            <Badge className="bg-green-500">{payment.status}</Badge>
+                            <Badge className="bg-green-500">
+                              {payment.status}
+                            </Badge>
                           </TableCell>
                           <TableCell>{payment.date}</TableCell>
                         </TableRow>
@@ -329,7 +409,9 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>{t("withdrawalHistory")}</CardTitle>
-                <CardDescription>{t("withdrawalHistoryDescription")}</CardDescription>
+                <CardDescription>
+                  {t("withdrawalHistoryDescription")}
+                </CardDescription>
               </div>
               <Button
                 variant="outline"
@@ -357,7 +439,9 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
                     <TableBody>
                       {userWithdrawals.map((withdrawal) => (
                         <TableRow key={withdrawal.id}>
-                          <TableCell className="font-medium">{withdrawal.id}</TableCell>
+                          <TableCell className="font-medium">
+                            {withdrawal.id}
+                          </TableCell>
                           <TableCell>${withdrawal.amount.toFixed(2)}</TableCell>
                           <TableCell>{withdrawal.cardNumber}</TableCell>
                           <TableCell>
@@ -366,8 +450,8 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
                                 withdrawal.status === "To'langan"
                                   ? "bg-green-500"
                                   : withdrawal.status === "Kutilmoqda"
-                                    ? "bg-gray-500"
-                                    : "bg-red-500"
+                                  ? "bg-gray-500"
+                                  : "bg-red-500"
                               }
                             >
                               {withdrawal.status}
@@ -394,7 +478,10 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
             <DialogDescription>{t("confirmDeleteMessage")}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
               {t("cancel")}
             </Button>
             <Button variant="destructive" onClick={handleDeleteUser}>
@@ -404,5 +491,5 @@ export default function UserDetailPage({ params }: { params: { id: string } }) {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

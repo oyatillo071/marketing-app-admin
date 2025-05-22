@@ -115,7 +115,7 @@ export const fetchUsers = async () => {
   return response.data;
 };
 
-export const fetchUserById = async (id: string) => {
+export const fetchUserById = async (id: string | number) => {
   const response = await api.get(`/users/${id}`);
   return response.data;
 };
@@ -155,10 +155,10 @@ export const fetchPayments = async () => {
 
 // Withdrawals
 export const fetchWithdrawals = async () => {
-  // if (useMockData()) {
-  //   await new Promise((resolve) => setTimeout(resolve, 500));
-  //   return mockData.withdrawals;
-  // }
+  if (true) {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    return mockData.withdrawals;
+  }
 
   const response = await api.get("/payments");
   return response.data;
@@ -208,15 +208,6 @@ export const fetchTariffs = async () => {
 };
 
 export const createTariff = async (data: any) => {
-  if (useMockData()) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return {
-      id: `TARIFF${Date.now()}`,
-      ...data,
-      status: "Faol",
-    };
-  }
-
   const response = await api.post("/tariff/add", data);
   return response.data;
 };
@@ -233,7 +224,7 @@ export const deleteTariff = async (id: string) => {
 
 // Notifications
 export const fetchNotifications = async () => {
-  if (useMockData()) {
+  if (true) {
     await new Promise((resolve) => setTimeout(resolve, 500));
     return mockData.notifications;
   }
@@ -243,7 +234,7 @@ export const fetchNotifications = async () => {
 };
 
 export const sendNotification = async (data: any) => {
-  if (useMockData()) {
+  if (true) {
     await new Promise((resolve) => setTimeout(resolve, 500));
     return {
       id: `NOT${Date.now()}`,

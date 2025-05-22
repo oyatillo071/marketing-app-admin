@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Download, Plus, TrashIcon } from "lucide-react";
+import { Download, EyeIcon, Plus, TrashIcon } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import {
   fetchUsers,
@@ -36,15 +36,14 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import Link from "next/link";
 
-// You should get this from auth context or props in real app
 export default function UsersPage() {
   const { t } = useLanguage();
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [currentUserRole, setCurrentUserRole] = useState("ADMIN");
-
   React.useEffect(() => {
     if (typeof window !== "undefined") {
       const role = localStorage.getItem("mlm_role");
@@ -406,7 +405,9 @@ export default function UsersPage() {
                     <td className="px-2 py-2">{user.name}</td>
                     <td className="px-2 py-2">{user.email}</td>
                     <td className="px-2 py-2">{user.role}</td>
-                    <td className="px-2 py-2">{user.balance}</td>
+                    <td className="px-2 py-2">
+                      {user.balance == 0 ? null : user.balance}
+                    </td>
                     <td className="px-2 py-2">
                       {new Date(user.createdAt).toLocaleString()}
                     </td>
@@ -421,7 +422,15 @@ export default function UsersPage() {
                         </span>
                       )}
                     </td>
-                    <td className="px-2 py-2 flex gap-2">
+                    <td className="px-2 py-2 flex gap-2 items-center">
+                      <Link
+                        className="border rounded-md p-2 border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                        href={`/dashboard/users/${user.id}`}
+                        aria-label={`View details of user ${user.name}`}
+                      >
+                        <EyeIcon className="w-5 h-5" />
+                      </Link>
+
                       <Button
                         size="sm"
                         variant="outline"
