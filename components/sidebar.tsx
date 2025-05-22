@@ -37,7 +37,7 @@ const SidebarLink = memo(
     onLinkClick,
   }: {
     item: { title: string; href: string; icon: any };
-    pathname: string;
+    pathname: any;
     onLinkClick: () => void;
   }) => {
     const Icon = item.icon;
@@ -112,6 +112,11 @@ export function Sidebar() {
     {
       title: t("tariffs"),
       href: "/dashboard/tariffs",
+      icon: Package,
+    },
+    {
+      title: t("products"),
+      href: "/dashboard/products",
       icon: Package,
     },
     {

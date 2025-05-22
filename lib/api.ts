@@ -56,28 +56,6 @@ export const useMockData = () => {
 
 // Auth
 export const loginUser = async (email: string, password: string) => {
-  // if (useMockData()) {
-  //   // Simulate API delay
-  //   await new Promise((resolve) => setTimeout(resolve, 300));
-
-  //   // For demo purposes, any credentials will work
-  //   if (email && password) {
-  //     // Generate a mock token
-  //     const token = `mock-token-${Date.now()}`;
-  //     localStorage.setItem("token", token);
-
-  //     return {
-  //       id: "admin",
-  //       email,
-  //       name: "Admin User",
-  //       role: "admin",
-  //       token,
-  //     };
-  //   }
-
-  //   throw new Error("Invalid credentials");
-  // }
-
   const response = await api.post("/authorization/login", { email, password });
   localStorage.setItem("token", response.data.token);
   localStorage.setItem("mlm-data", JSON.stringify(response.data.data));
@@ -89,36 +67,24 @@ export const loginUser = async (email: string, password: string) => {
 };
 
 export const resetPassword = async (phone: string) => {
-  if (useMockData()) {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+  // if (useMockData()) {
+  //   // Simulate API delay
+  //   await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // Check if phone exists
-    const user = mockData.users.find((u) => u.phone === phone);
-    if (!user) {
-      throw new Error("Phone number not found");
-    }
+  //   // Check if phone exists
+  //   const user = mockData.users.find((u) => u.phone === phone);
+  //   if (!user) {
+  //     throw new Error("Phone number not found");
+  //   }
 
-    return { success: true, message: "SMS sent with reset code" };
-  }
+  //   return { success: true, message: "SMS sent with reset code" };
+  // }
 
   const response = await api.post("/auth/reset-password", { phone });
   return response.data;
 };
 
 export const verifyResetCode = async (phone: string, code: string) => {
-  if (useMockData()) {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Any 6-digit code will work for demo
-    if (code.length === 6) {
-      return { success: true, message: "Code verified" };
-    }
-
-    throw new Error("Invalid code");
-  }
-
   const response = await api.post("/auth/verify-reset-code", { phone, code });
   return response.data;
 };
@@ -372,26 +338,33 @@ export const fetchCardsByCountry = async (countries: string) => {
   return response.data;
 };
 
-export const apiProducts = async () => {
-  const res = await api("/product");
-  return res.data;
+// ===================== PRODUCTS ==============================
+export const fetchProducts = async () => {
+  const response = await api.get("/products");
+  return response.data;
 };
-export const addProduct = async (data: any) => {
-  console.log(data, "data 350qator");
 
-  const res = await api.post("/product/add", data);
-  return res.data;
+export const fetchProductsById = async (id: string) => {
+  const response = await api.get(`/products/${id}`);
+  return response.data;
+};
+
+export const createProduct = async (data: any) => {
+  const response = await api.post("/products", data);
+  return response.data;
 };
 
 export const updateProduct = async (id: string, data: any) => {
-  const res = await api.put(`/product/${id}`, data);
-  return res.data;
-};
-export const deleteProduct = async (id: string) => {
-  await api.delete(`/product/${id}`);
+  const response = await api.put(`/product/${id}`, data);
+  return response.data;
 };
 
-// upload image
+export const deleteProduct = async (id: string) => {
+  const response = await api.delete(`/products/${id}`);
+  return response.data;
+};
+
+//=========================== Upload image ============================
 export const uploadImage = async (file: File) => {
   const formData = new FormData();
   formData.append("file", file);
@@ -405,7 +378,22 @@ export const uploadImage = async (file: File) => {
   return res.data; // { url: "...", path: "..." }
 };
 
-// admin section
+export const uploadMultImage = async (files: FileList | File[]) => {
+  const formData = new FormData();
+  // Bir nechta faylni qo‘shish
+  Array.from(files).forEach((file) => {
+    formData.append("files", file);
+  });
+
+  const res = await api.post("/upload/multiple", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return res.data; // [{ photo_url: "..." }, ...]
+};
+
+// =========================== Admin Section ==============================
 export const addAdmin = async (admin: {
   name: string;
   email: string;

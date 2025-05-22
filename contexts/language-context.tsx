@@ -19,6 +19,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
 // Simple translations
 const translations: Record<Language, Record<string, string>> = {
   uz: {
+    products: "Mahsulotlar",
     filterByType: "Turga ko'ra filtrlash",
     filterByCountry: "Davlatga ko'ra filtrlash",
     addCard: "Karta qo'shish",
@@ -319,6 +320,7 @@ const translations: Record<Language, Record<string, string>> = {
     passwordUpdatedDescription: "Parolingiz muvaffaqiyatli yangilandi",
   },
   en: {
+    products: "products",
     basicInfo: "Basic Info",
     addTariff: "Add Tariff",
     translations: "Translations",
@@ -889,6 +891,7 @@ const translations: Record<Language, Record<string, string>> = {
   //   passwordUpdatedDescription: "Жупаш сөөгүңүз ийгиликтүү жаңыртылды",
   // },
   ru: {
+    products: "продукты",
     basicInfo: "Основная информация",
     translations: "Переводы",
     prices: "Цены",
@@ -1112,6 +1115,7 @@ const translations: Record<Language, Record<string, string>> = {
     passwordUpdatedDescription: "Ваш пароль успешно обновлен",
   },
   kz: {
+    products: "products",
     addTariff: "Добавить тариф",
     basicInfo: "Негізгі ақпарат",
     translations: "Аудармалар",
@@ -1402,6 +1406,7 @@ const translations: Record<Language, Record<string, string>> = {
     passwordUpdatedDescription: "Жупаш сөөгүңүз ийгиликтүү жаңыртылды",
   },
   kg: {
+    products: "products",
     basicInfo: "Basic Info",
     translations: "Translations",
     prices: "Prices",
@@ -1614,6 +1619,7 @@ const translations: Record<Language, Record<string, string>> = {
     noWithdrawals: "Ҳеҷ гуна пултозӣ нест",
   },
   tj: {
+    products: "products",
     basicInfo: "Маълумоти асосӣ",
     translations: "Тарҷумаҳо",
     prices: "Нархҳо",
@@ -1826,6 +1832,7 @@ const translations: Record<Language, Record<string, string>> = {
     noWithdrawals: "Ҳеҷ гуна пултозӣ нест",
   },
   cn: {
+    products: "products",
     dashboard: "仪表板",
     users: "用户",
     payments: "支付",
