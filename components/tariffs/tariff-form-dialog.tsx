@@ -36,7 +36,8 @@ export function TariffFormDialog({
 	initialData,
 }: any) {
 	const { t } = useLanguage();
-
+  // console.log(initialData," initialData");
+  
 	// Multi-language state
 	const [activeLang, setActiveLang] = useState(languages[0].code);
 	const [translations, setTranslations] = useState(
@@ -180,7 +181,7 @@ export function TariffFormDialog({
 		setUploading(false);
 
 		onSubmit({
-			id: initialData?.id, // <-- id ni uzatish
+      id: initialData?.id,
 			term: Number(term),
 			referral_bonus: Number(referralBonus),
 			photo_url: uploadedPhotoUrl,
@@ -207,7 +208,7 @@ export function TariffFormDialog({
 
 	useEffect(() => {
 		setTranslations(
-			languages.map((lang) => {
+			languages.map((lang) => { 
 				const found =
 					initialData?.translations?.find(
 						(tr: any) => tr.language === lang.code

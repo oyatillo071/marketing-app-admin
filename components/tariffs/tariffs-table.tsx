@@ -219,7 +219,7 @@ export function TariffsTable() {
               <DropdownMenuItem
                 onClick={() => {
                   const newStatus =
-                    tariff.status === "Faol" ? "Nofaol" : "Faol";
+                    tariff.status === "active" ? "unactive" : "active";
                   updateTariff(tariff.id, {
                     ...tariff._original,
                     status: newStatus,
@@ -271,8 +271,10 @@ export function TariffsTable() {
 
   const handleFormSubmit = (data: any) => {
     if (currentTariff) {
+      console.log("Form submitted with data 273qator table:", data);
       // Update existing tariff
-      updateTariff(currentTariff.id, data);
+        const { id, ...rest } = data;
+    updateTariff({ id, data: rest });
     } else {
       // Create new tariff
       createTariff(data);

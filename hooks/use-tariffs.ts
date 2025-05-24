@@ -32,13 +32,15 @@ export const useTariffs = () => {
 
   // Update
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
+    mutationFn: ({ id, data }: { id: string|number; data: any }) =>
+      
       updateTariffApi(id, data),
     onSuccess: () => {
       toast.success("Tarif yangilandi");
       queryClient.invalidateQueries({ queryKey: ["tariffs"] });
     },
     onError: () => {
+        
       toast.error("Tarif yangilashda xatolik yuz berdi");
     },
   });

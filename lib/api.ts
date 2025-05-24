@@ -212,7 +212,9 @@ export const createTariff = async (data: any) => {
   return response.data;
 };
 
-export const updateTariff = async (id: string, data: any) => {
+export const updateTariff = async (id: string|number, data: any) => {
+  console.log("Updating tariff with data:", id, data);
+  
   const response = await api.put(`/tariff/update/${id}`, data);
   return response.data;
 };
