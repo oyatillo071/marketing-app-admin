@@ -224,27 +224,15 @@ export const deleteTariff = async (id: string) => {
 
 // Notifications
 export const fetchNotifications = async () => {
-  if (true) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return mockData.notifications;
-  }
+  
 
-  const response = await api.get("/notifications");
+  const response = await api.get("/notification");
   return response.data;
 };
 
-export const sendNotification = async (data: any) => {
-  if (true) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return {
-      id: `NOT${Date.now()}`,
-      ...data,
-      date: new Date().toISOString(),
-      status: "Yuborilgan",
-    };
-  }
-
-  const response = await api.post("/notifications", data);
+export const sendNotification = async (data: any, endpoint: string = "") => {
+  const url = endpoint === "all" ? "/notification/all" : "/notification";
+  const response = await api.post(url, data);
   return response.data;
 };
 
@@ -346,11 +334,11 @@ export const createProduct = async (data: any) => {
 };
 
 export const updateProduct = async (id: string, data: any) => {
-  const response = await api.put(`/product/${id}`, data);
+  const response = await api.patch(`/product/${id}`, data);
   return response.data;
 };
 
-export const deleteProduct = async (id: string) => {
+export const deleteProduct = async (id: string|number) => {
   const response = await api.delete(`/products/${id}`);
   return response.data;
 };
@@ -371,7 +359,6 @@ export const uploadImage = async (file: File) => {
 
 export const uploadMultImage = async (files: FileList | File[]) => {
   const formData = new FormData();
-  // Bir nechta faylni qo‘shish
   Array.from(files).forEach((file) => {
     formData.append("files", file);
   });
@@ -381,7 +368,16 @@ export const uploadMultImage = async (files: FileList | File[]) => {
       "Content-Type": "multipart/form-data",
     },
   });
-  return res.data; // [{ photo_url: "..." }, ...]
+
+  // Agar javobda urls massiv bo'lsa, uni kerakli formatga o'tkazamiz
+  if (res.data && Array.isArray(res.data.urls)) {
+    return res.data.urls.map((url: string) => ({ photo_url: url }));
+  }
+  // Agar eski formatda kelsa, uni ham tekshirib qaytaramiz
+  if (Array.isArray(res.data)) {
+    return res.data.map((url: string) => ({ photo_url: url }));
+  }
+  return [];
 };
 
 // =========================== Admin Section ==============================

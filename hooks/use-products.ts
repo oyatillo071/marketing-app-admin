@@ -84,6 +84,6 @@ export function useProducts() {
     createProduct: (data: any) => createMutation.mutate(data),
     updateProduct: (id: string, data: any) =>
       updateMutation.mutate({ id, data }),
-    deleteProduct: (id: string) => deleteMutation.mutate(id),
+    deleteProduct: (id: string|number) => deleteMutation.mutate(id),
   };
 }

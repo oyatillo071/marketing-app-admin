@@ -1,11 +1,11 @@
 "use client"
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { fetchNotifications, sendNotification } from "@/lib/api"
-import { toast } from "@/components/ui/use-toast"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchNotifications, sendNotification } from "@/lib/api";
+import { toast } from "sonner";
 
 export function useNotifications() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const {
     data = [],
@@ -14,30 +14,35 @@ export function useNotifications() {
   } = useQuery({
     queryKey: ["notifications"],
     queryFn: fetchNotifications,
-  })
+  });
 
   const sendMutation = useMutation({
-    mutationFn: sendNotification,
+    mutationFn: (data: any) => sendNotification(data, ""),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] })
-      toast({
-        title: "Bildirishnoma yuborildi",
-        description: "Bildirishnoma muvaffaqiyatli yuborildi.",
-      })
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      toast.success("Bildirishnoma muvaffaqiyatli yuborildi.");
     },
     onError: (error: any) => {
-      toast({
-        title: "Xatolik yuz berdi",
-        description: error.message || "Bildirishnomani yuborishda xatolik yuz berdi.",
-        variant: "destructive",
-      })
+      toast.error(error.message || "Bildirishnomani yuborishda xatolik yuz berdi.");
     },
-  })
+  });
+
+  const sendAllMutation = useMutation({
+    mutationFn: (data: any) => sendNotification(data, "all"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      toast.success("Barcha foydalanuvchilarga yuborildi.");
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Barchaga yuborishda xatolik yuz berdi.");
+    },
+  });
 
   return {
     data,
     isLoading,
     error,
-    sendNotification: (data: any) => sendMutation.mutate(data),
-  }
+    sendNotification: (data: any) => sendMutation.mutateAsync(data),
+    sendNotificationAll: (data: any) => sendAllMutation.mutateAsync(data),
+  };
 }

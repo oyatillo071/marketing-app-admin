@@ -206,7 +206,8 @@ export function TariffsTable() {
               </DropdownMenuItem>
 
               <DropdownMenuItem
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   setCurrentTariff(tariff._original);
                   setFormOpen(true);
                 }}
@@ -421,7 +422,7 @@ export function TariffsTable() {
       <TariffFormDialog
         open={formOpen}
         onOpenChange={setFormOpen}
-        tariff={currentTariff}
+        initialData={currentTariff}
         onSubmit={handleFormSubmit}
       />
     </div>

@@ -13,6 +13,18 @@ export function ProductsTable() {
     product: any | null;
   }>({ open: false, product: null });
 
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    productId: string | null;
+  }>({ open: false, productId: null });
+
+  const handleDelete = async () => {
+    if (confirmDialog.productId) {
+      await deleteProduct(confirmDialog.productId);
+      setConfirmDialog({ open: false, productId: null });
+    }
+  };
+
   if (!data) return <div className="text-center py-10">{t("loading")}</div>;
 
   return (
@@ -55,7 +67,9 @@ export function ProductsTable() {
                 <Button
                   size="sm"
                   variant="destructive"
-                  onClick={() => deleteProduct(product.id)}
+                  onClick={() =>
+                    setConfirmDialog({ open: true, productId: product.id })
+                  }
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -77,6 +91,28 @@ export function ProductsTable() {
           }}
           initialData={editDialog.product}
         />
+      )}
+
+      {confirmDialog.open && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-4">{t("confirmDelete")}</h2>
+            <div className="flex justify-end space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => setConfirmDialog({ open: false, productId: null })}
+              >
+                {t("cancel")}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+              >
+                {t("delete")}
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

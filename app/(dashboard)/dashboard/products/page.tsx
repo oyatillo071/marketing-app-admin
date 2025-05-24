@@ -30,6 +30,8 @@ export default function ProductsPage() {
   };
 
   const handleAddProduct = (data: any) => {
+    console.table(data);
+    
     createProduct(data);
     setIsAddDialogOpen(false);
   };

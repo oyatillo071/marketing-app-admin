@@ -2,477 +2,152 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  ArrowUpRight,
-  BarChart3,
-  DollarSign,
-  Download,
-  Loader2,
-  Plus,
-  Trash2,
-  Users,
-  Edit,
-} from "lucide-react";
-import { RevenueChart } from "@/components/dashboard/revenue-chart";
-import { TariffDistributionChart } from "@/components/statistics/tariff-distribution-chart";
 import { useLanguage } from "@/contexts/language-context";
-import { useStatistics } from "@/hooks/use-statistics";
-import { exportStatsToPDF } from "@/lib/pdf-export";
-import { usePayments } from "@/hooks/use-payments";
-import { useWithdrawals } from "@/hooks/use-withdrawals";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { UserActivityChart } from "@/components/statistics/user-activity-chart";
+import Link from "next/link";
+import { Download, Loader2, Plus } from "lucide-react";
+import { useStatistics } from "@/hooks/use-add-statistics";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { StatisticsForm } from "@/components/statistics/statistics-form";
+const MOCK_STATISTICS = [
+	{
+		id: "89628415-df6b-47be-8295-315e9702f5f8",
+		onlineUserCount: 422,
+		totalEarned: "250.06",
+		statEarnings: [
+			{
+				id: "9e5b1e63-385b-4ee5-ac87-04ab8f19e181",
+				currency: "USD",
+				amount: "850.89",
+				widgetId: "89628415-df6b-47be-8295-315e9702f5f8",
+			},
+		],
+		recentUsers: [
+			{
+				id: "1c8c9982-b188-4438-8092-0e8c78f4f477",
+				email: "user878@example.com",
+				widgetId: "89628415-df6b-47be-8295-315e9702f5f8",
+			},
+			{
+				id: "528c9f40-22f9-4b2f-8935-9865c2b65f85",
+				email: "user5982@example.com",
+				widgetId: "89628415-df6b-47be-8295-315e9702f5f8",
+			},
+			{
+				id: "d028645e-f272-4434-9b70-3a829df433e1",
+				email: "user1943@example.com",
+				widgetId: "89628415-df6b-47be-8295-315e9702f5f8",
+			},
+			{
+				id: "e5407de7-36f5-4236-9b2f-3ecfa0a498b3",
+				email: "user5106@example.com",
+				widgetId: "89628415-df6b-47be-8295-315e9702f5f8",
+			},
+		],
+	},
+	// ... boshqa statistikalar ...
+];
 
 export default function StatisticsPage() {
-  const { t } = useLanguage();
-  const {
-    data: statistics,
-    isLoading,
-    createStatistics,
-    updateStatistics,
-    deleteStatistics,
-    isCreating,
-    isUpdating,
-    isDeleting,
-  } = useStatistics();
-  const { data: payments } = usePayments();
-  const { data: withdrawals } = useWithdrawals();
+	const { t } = useLanguage();
+	const [useMock, setUseMock] = useState(true);
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [currentStatistics, setCurrentStatistics] = useState<any>(null);
+	const {
+		data: apiStatistics,
+		isLoading,
+	} = useStatistics();
 
-  const handleExport = () => {
-    if (statistics) {
-      exportStatsToPDF(statistics, t("statistics"), "statistics-export");
-    }
-  };
+	// Massiv bo‘lsa, uni ishlatamiz
+	const statisticsList = useMock ? MOCK_STATISTICS : apiStatistics;
 
-  const handleCreateOrUpdate = (data: any) => {
-    if (currentStatistics) {
-      updateStatistics(currentStatistics.id, data);
-    } else {
-      createStatistics(data);
-    }
-    setIsFormOpen(false);
-  };
+	if (isLoading && !useMock) {
+		return (
+			<div className="flex-1 flex items-center justify-center">
+				<Loader2 className="h-8 w-8 animate-spin text-primary" />
+				<span className="ml-2">{t("loading")}</span>
+			</div>
+		);
+	}
 
-  const handleDelete = () => {
-    if (currentStatistics && currentStatistics.id) {
-      deleteStatistics(currentStatistics.id);
-      setIsDeleteDialogOpen(false);
-    }
-  };
+	if (!statisticsList || !Array.isArray(statisticsList) || statisticsList.length === 0) {
+		return (
+			<div className="flex flex-col items-center justify-center h-64 bg-muted rounded-lg p-6">
+				<p className="text-lg mb-4">{t("noStatisticsFound") || "No statistics found"}</p>
+			</div>
+		);
+	}
 
-  if (isLoading) {
-    return (
-      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p>{t("loading")}</p>
-        </div>
-      </div>
-    );
-  }
-  console.log(statistics);
-  return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <h2 className="text-3xl font-bold tracking-tight">{t("statistics")}</h2>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExport}
-            disabled={!statistics}
-          >
-            <Download className="mr-2 h-4 w-4" />
-            {t("downloadPDF")}
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => {
-              setCurrentStatistics(null);
-              setIsFormOpen(true);
-            }}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {t("add")}
-          </Button>
-          {statistics && (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setCurrentStatistics(statistics);
-                  setIsFormOpen(true);
-                }}
-              >
-                <Edit className="mr-2 h-4 w-4" />
-                {t("edit")}
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => {
-                  setCurrentStatistics(statistics);
-                  setIsDeleteDialogOpen(true);
-                }}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                {t("delete")}
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
+	return (
+		<div className="flex-1 space-y-8 p-4 md:p-8 pt-6 max-w-3xl mx-auto">
+			<div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+				<h2 className="text-3xl font-bold tracking-tight">{t("statistics")}</h2>
+				<div className="flex flex-wrap gap-2">
+					<Link href="/dashboard/statistics/add-users-statistics">
+						<Button variant="secondary" size="sm">
+							{t("addUserStatistics") || "Foydalanuvchi statistikasi"}
+						</Button>
+					</Link>
+					<Button
+						variant="outline"
+						size="sm"
+						disabled={statisticsList.length === 0}
+					>
+						<Download className="mr-2 h-4 w-4" />
+						{t("downloadPDF")}
+					</Button>
+					{/* <Button
+						size="sm"
+						onClick={() =>
+					>
+						<Plus className="mr-2 h-4 w-4" />
+						{t("add")}
+					</Button> */}
+					<Button
+						size="sm"
+						variant={useMock ? "default" : "outline"}
+						onClick={() => setUseMock(!useMock)}
+					>
+						{useMock ? "Users" : "Admin"} statistics
+					</Button>
+				</div>
+			</div>
 
-      {!statistics || statistics.length == 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 bg-muted rounded-lg p-6">
-          <p className="text-lg mb-4">{t("noStatisticsFound")}</p>
-          <Button
-            onClick={() => {
-              setCurrentStatistics(null);
-              setIsFormOpen(true);
-            }}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {t("createStatistics")}
-          </Button>
-        </div>
-      ) : (
-        <Tabs defaultValue="umumiy" className="space-y-4">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <TabsTrigger value="umumiy">{t("overview")}</TabsTrigger>
-            <TabsTrigger value="foydalanuvchilar">{t("users")}</TabsTrigger>
-            <TabsTrigger value="tolovlar">{t("payments")}</TabsTrigger>
-            <TabsTrigger value="yechib_olishlar">
-              {t("withdrawals")}
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="umumiy" className="space-y-4">
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t("totalUsers")}
-                  </CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {statistics.userStats?.total}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {t("allUsers")}
-                  </p>
-                  <div className="text-sm font-medium text-green-500 mt-2">
-                    +{statistics.userStats?.growth}% {t("comparedToLastMonth")}
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t("totalRevenue")}
-                  </CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    ${statistics?.revenueStats?.total.toLocaleString()}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {t("allTime")}
-                  </p>
-                  <div className="text-sm font-medium text-green-500 mt-2">
-                    +{statistics?.revenueStats?.growth}%{" "}
-                    {t("comparedToLastMonth")}
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t("activeTariffs")}
-                  </CardTitle>
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {statistics?.tariffStats?.total}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {t("currentlyActiveTariffs")}
-                  </p>
-                  <div className="text-sm font-medium text-green-500 mt-2">
-                    +{statistics?.tariffStats?.growth}%{" "}
-                    {t("comparedToLastMonth")}
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t("pendingWithdrawals")}
-                  </CardTitle>
-                  <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {statistics?.withdrawalStats?.pending}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {t("withdrawalRequests")}
-                  </p>
-                  <div className="text-sm font-medium text-red-500 mt-2">
-                    {statistics?.withdrawalStats?.growth}%{" "}
-                    {t("comparedToLastMonth")}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
-              <Card className="col-span-1 lg:col-span-4">
-                <CardHeader>
-                  <CardTitle>{t("revenueStatistics")}</CardTitle>
-                </CardHeader>
-                <CardContent className="pl-2">
-                  <RevenueChart data={statistics.monthlyRevenue} />
-                </CardContent>
-              </Card>
-              <Card className="col-span-1 lg:col-span-3">
-                <CardHeader>
-                  <CardTitle>{t("tariffDistribution")}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <TariffDistributionChart
-                    data={[
-                      {
-                        name: "Premium",
-                        value: statistics.tariffStats.premium,
-                        color: "#ef4444",
-                      },
-                      {
-                        name: "Standard",
-                        value: statistics.tariffStats.standard,
-                        color: "#22c55e",
-                      },
-                      {
-                        name: "Basic",
-                        value: statistics.tariffStats.basic,
-                        color: "#6b7280",
-                      },
-                    ]}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          <TabsContent value="foydalanuvchilar" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("userActivity")}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px]">
-                  <UserActivityChart data={statistics.userActivity} />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="tolovlar" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("paymentStatistics")}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t("id")}</TableHead>
-                        <TableHead>{t("name")}</TableHead>
-                        <TableHead>{t("amount")}</TableHead>
-                        <TableHead>{t("status")}</TableHead>
-                        <TableHead>{t("date")}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {payments && payments.length > 0 ? (
-                        payments.slice(0, 5).map((payment: any) => (
-                          <TableRow key={payment.id}>
-                            <TableCell className="font-medium">
-                              {payment.id}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center">
-                                <Avatar className="h-8 w-8 mr-2 bg-red-500">
-                                  <AvatarFallback>
-                                    {payment.user.initials}
-                                  </AvatarFallback>
-                                </Avatar>
-                                {payment.user.name}
-                              </div>
-                            </TableCell>
-                            <TableCell>${payment.amount.toFixed(2)}</TableCell>
-                            <TableCell>
-                              <Badge className="bg-green-500">
-                                {payment.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>{payment.date}</TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={5} className="h-24 text-center">
-                            {t("noDataFound")}
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="yechib_olishlar" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("withdrawalStatistics")}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t("id")}</TableHead>
-                        <TableHead>{t("name")}</TableHead>
-                        <TableHead>{t("amount")}</TableHead>
-                        <TableHead>{t("cardNumber")}</TableHead>
-                        <TableHead>{t("status")}</TableHead>
-                        <TableHead>{t("date")}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {withdrawals && withdrawals.length > 0 ? (
-                        withdrawals.slice(0, 5).map((withdrawal: any) => (
-                          <TableRow key={withdrawal.id}>
-                            <TableCell className="font-medium">
-                              {withdrawal.id}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center">
-                                <Avatar className="h-8 w-8 mr-2 bg-red-500">
-                                  <AvatarFallback>
-                                    {withdrawal.user.initials}
-                                  </AvatarFallback>
-                                </Avatar>
-                                {withdrawal.user.name}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              ${withdrawal.amount.toFixed(2)}
-                            </TableCell>
-                            <TableCell className="whitespace-nowrap">
-                              {withdrawal.cardNumber}
-                            </TableCell>
-                            <TableCell>
-                              <Badge
-                                className={
-                                  withdrawal.status === "To'langan"
-                                    ? "bg-green-500"
-                                    : withdrawal.status === "Kutilmoqda"
-                                    ? "bg-gray-500"
-                                    : "bg-red-500"
-                                }
-                              >
-                                {withdrawal.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>{withdrawal.date}</TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={6} className="h-24 text-center">
-                            {t("noDataFound")}
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      )}
+			{/* Har bir statistikani details blokda ko‘rsatish */}
+			{statisticsList.map((statistics: any) => (
+				<div key={statistics.id} className="space-y-4 bg-white dark:bg-[#18181b] rounded-lg shadow p-4">
+					<div className="flex flex-col sm:flex-row gap-4">
+						<div className="flex-1">
+							<div className="text-gray-500 text-sm">{t("onlineUserCount") || "Online foydalanuvchilar"}</div>
+							<div className="text-2xl font-bold">{statistics.onlineUserCount}</div>
+						</div>
+						<div className="flex-1">
+							<div className="text-gray-500 text-sm">{t("totalEarned") || "Jami daromad"}</div>
+							<div className="text-2xl font-bold">{statistics.totalEarned}</div>
+						</div>
+					</div>
 
-      {/* Statistics Form Dialog */}
-      <StatisticsForm
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        statistics={currentStatistics}
-        onSubmit={handleCreateOrUpdate}
-        isSubmitting={isCreating || isUpdating}
-      />
+					<div>
+						<div className="font-semibold mb-2">{t("statEarnings") || "Statistik daromadlar"}</div>
+						<div className="flex flex-wrap gap-4">
+							{statistics.statEarnings?.map((s: any) => (
+								<div key={s.id} className="border rounded px-3 py-2 min-w-[120px]">
+									<div className="text-gray-500 text-xs">{s.currency}</div>
+									<div className="font-bold">{s.amount}</div>
+								</div>
+							))}
+						</div>
+					</div>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t("confirmDelete")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("confirmDeleteMessage")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-red-500 hover:bg-red-600"
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t("deleting")}
-                </>
-              ) : (
-                t("delete")
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
+					<div>
+						<div className="font-semibold mb-2">{t("recentUsers") || "Oxirgi foydalanuvchilar"}</div>
+						<div className="flex flex-wrap gap-2">
+							{statistics.recentUsers?.map((user: any) => (
+								<div key={user.id} className="border rounded px-3 py-2 min-w-[180px] bg-gray-50 dark:bg-[#23232b]">
+									<div className="font-medium">{user.email}</div>
+								</div>
+							))}
+						</div>
+					</div>
+				</div>
+			))}
+		</div>
+	);
 }

@@ -7,6 +7,7 @@ import { useState } from "react";
 import { languages } from "../language-switcher";
 import Image from "next/image";
 import { uploadMultImage } from "@/lib/api";
+import { toast } from "sonner";
 
 export function ProductFormDialog({
   open,
@@ -108,23 +109,86 @@ export function ProductFormDialog({
     e.preventDefault();
     setUploading(true);
 
-    let uploadedPhotos = [...photoUrls];
+    // --- VALIDATSIYA ---
+    const priceErrors = prices.some(
+      (p: any) =>
+        !p.currency ||
+        !allowedCurrencies.find((c) => c.code === p.currency) ||
+        !p.value ||
+        isNaN(Number(p.value)) ||
+        Number(p.value) <= 0
+    );
+    if (priceErrors) {
+      toast.error("Valyuta va narxlarni to'g'ri kiriting!");
+      setUploading(false);
+      return;
+    }
+
+    if (photoFiles.length + photoUrls.length === 0) {
+      toast.error("Kamida bitta rasm yuklang!");
+      setUploading(false);
+      return;
+    }
+
+    let uploadedPhotos = Array.isArray(photoUrls)
+      ? photoUrls
+          .filter((p) => typeof p?.photo_url === "string" && p.photo_url.trim() !== "")
+          .map((p) => ({ photo_url: p.photo_url }))
+      : [];
+
     if (photoFiles.length > 0) {
       try {
         const files = photoFiles.map((pf) => pf.file);
         const data = await uploadMultImage(files);
-        uploadedPhotos = [...uploadedPhotos, ...data].slice(0, 10);
-      } catch (err) {
-        // handle error if needed
+
+        // uploadMultImage har doim [{ photo_url: "..." }] formatida qaytadi
+        const formatted = Array.isArray(data)
+          ? data
+              .filter((p) => typeof p?.photo_url === "string" && p.photo_url.trim() !== "")
+              .map((p) => ({ photo_url: p.photo_url }))
+          : [];
+
+        uploadedPhotos = [...uploadedPhotos, ...formatted].slice(0, 10);
+      } catch (err: any) {
+        toast.error(err?.message || "Rasm yuklashda xatolik");
+        setUploading(false);
+        return;
       }
     }
 
+    // API-ga yuborish
+    await onSubmit({
+      rating: Number(rating),
+      rewiev: Number(rewiev),
+      photo_url: uploadedPhotos, // Faqat massiv va har bir elementda faqat photo_url property
+      translations,
+      prices: prices
+        .filter(
+          (p: any) =>
+            p.currency &&
+            allowedCurrencies.find((c) => c.code === p.currency) &&
+            p.value &&
+            !isNaN(Number(p.value)) &&
+            Number(p.value) > 0
+        )
+        .map((p: any) => ({
+          currency: p.currency,
+          value: Number(p.value),
+        })),
+    });
+
     setUploading(false);
 
+    // Clean up previews
+    photoFiles.forEach((pf) => URL.revokeObjectURL(pf.preview));
+    setPhotoFiles([]);
+
+    // --- Eski variant (keyinchalik ishlatish uchun) ---
+    /*
     onSubmit({
       rating: Number(rating),
       rewiev: Number(rewiev),
-      photo_url: uploadedPhotos.filter((p: any) => p.photo_url),
+      photo_url: uploadedPhotos, // filter kerak emas
       translations,
       prices: prices
         .filter((p: any) => p.currency && p.value)
@@ -133,15 +197,22 @@ export function ProductFormDialog({
           value: Number(p.value),
         })),
     });
-
-    // Clean up previews
-    photoFiles.forEach((pf) => URL.revokeObjectURL(pf.preview));
-    setPhotoFiles([]);
+    */
   };
+
+  // Valyutalar select uchun
+  const allowedCurrencies = [
+    { code: "UZS", name: "UZS (so'm)" },
+    { code: "USD", name: "USD (dollar)" },
+    { code: "RUB", name: "RUB (rubl)" },
+    { code: "KZT", name: "KZT (tenge)" },
+    { code: "KGS", name: "KGS (som)" },
+    { code: "TJS", name: "TJS (somoni)" },
+  ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-2xl">
         <DialogTitle>{t("addCard")}</DialogTitle>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex gap-2">
@@ -300,13 +371,19 @@ export function ProductFormDialog({
             <label className="block mb-1">{t("prices")}</label>
             {prices.map((price: any, idx: number) => (
               <div key={idx} className="flex gap-2 mb-2">
-                <Input
-                  placeholder={t("price") + " currency"}
+                <select
                   value={price.currency}
-                  onChange={(e) =>
-                    handlePriceChange(idx, "currency", e.target.value)
-                  }
-                />
+                  onChange={(e) => handlePriceChange(idx, "currency", e.target.value)}
+                  className="border rounded px-2 py-1"
+                  required
+                >
+                  <option value="">Valyutani tanlang</option>
+                  {allowedCurrencies.map((cur) => (
+                    <option key={cur.code} value={cur.code}>
+                      {cur.name}
+                    </option>
+                  ))}
+                </select>
                 <Input
                   type="number"
                   placeholder={t("price")}
@@ -314,6 +391,8 @@ export function ProductFormDialog({
                   onChange={(e) =>
                     handlePriceChange(idx, "value", e.target.value)
                   }
+                  min={1}
+                  required
                 />
                 <Button
                   type="button"

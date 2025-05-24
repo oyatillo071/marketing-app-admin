@@ -15,8 +15,8 @@ export default function NotificationsPage() {
         </h2>
       </div>
 
-      <div className="gap-6 flex flex-wrap items-center">
-        <div className="max-w-[500px] p-2">
+      <div className="grid grid-cols-1  gap-6 items-start">
+        <div className="p-2">
           <h3 className="text-lg font-medium mb-4">{t("newNotification")}</h3>
           <NotificationsForm />
         </div>

@@ -16,6 +16,7 @@ export const languages = [
   { code: "kz", name: "Kazakh" },
   { code: "kg", name: "Kyrgyz" },
   { code: "tj", name: "Tajik" },
+  {code:"cn", name:"Chinese"},
 ];
 
 export function LanguageSwitcher() {
