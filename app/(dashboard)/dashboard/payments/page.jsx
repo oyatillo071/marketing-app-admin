@@ -13,22 +13,29 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Download, Loader2, Search } from "lucide-react";
 import { useState } from "react";
 import { exportToPDF } from "@/lib/pdf-export";
 import { useLanguage } from "@/contexts/language-context";
 import Link from "next/link";
-// import CardsSection from "./Card/page.jsx";
 
 export default function PaymentsPage() {
   const { t } = useLanguage();
-  const { data: payments, isLoading } = usePayments();
+  const { data: payments = [], isLoading } = usePayments();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const filteredPayments = payments.filter(
     (payment) =>
-      payment.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.id.toLowerCase().includes(searchTerm.toLowerCase())
+      payment.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(payment.id).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleExport = () => {
@@ -41,6 +48,11 @@ export default function PaymentsPage() {
     ];
 
     exportToPDF(payments, columns, t("payments"), "payments-export");
+  };
+
+  const openDetailsDialog = (payment) => {
+    setSelectedPayment(payment);
+    setIsDialogOpen(true);
   };
 
   return (
@@ -78,7 +90,6 @@ export default function PaymentsPage() {
           />
         </div>
       </div>
-      {/* <CardsSection /> */}
 
       {isLoading ? (
         <div className="flex items-center justify-center h-64">
@@ -92,8 +103,11 @@ export default function PaymentsPage() {
                 <TableHead>{t("id")}</TableHead>
                 <TableHead>{t("name")}</TableHead>
                 <TableHead>{t("amount")}</TableHead>
+                <TableHead>{t("currency")}</TableHead>
+                <TableHead>{t("coin")}</TableHead>
                 <TableHead>{t("status")}</TableHead>
                 <TableHead>{t("date")}</TableHead>
+                <TableHead>{t("actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -105,22 +119,44 @@ export default function PaymentsPage() {
                       <div className="flex items-center">
                         <Avatar className="h-8 w-8 mr-2 bg-red-500">
                           <AvatarFallback>
-                            {payment.user.initials}
+                            {payment.user?.name
+                              ?.split(" ")
+                              .map((n) => n[0])
+                              .join("") || "U"}
                           </AvatarFallback>
                         </Avatar>
-                        {payment.user.name}
+                        {payment.user?.name}
                       </div>
                     </TableCell>
-                    <TableCell>${payment.amount.toFixed(2)}</TableCell>
+                    <TableCell>
+                      {typeof payment.how_much === "number"
+                        ? `${payment.how_much.toFixed(2)}`
+                        : "-"}
+                    </TableCell>
+                    <TableCell>{payment.currency || "-"}</TableCell>
+                    <TableCell>{payment.coin || "-"}</TableCell>
                     <TableCell>
                       <Badge className="bg-green-500">{payment.status}</Badge>
                     </TableCell>
-                    <TableCell>{payment.date}</TableCell>
+                    <TableCell>
+                      {payment.date
+                        ? new Date(payment.date).toLocaleString()
+                        : "-"}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openDetailsDialog(payment)}
+                      >
+                        {t("details")}
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center">
+                  <TableCell colSpan={8} className="h-24 text-center">
                     {searchTerm ? t("noSearchResults") : t("noDataFound")}
                   </TableCell>
                 </TableRow>
@@ -129,6 +165,73 @@ export default function PaymentsPage() {
           </Table>
         </div>
       )}
+
+      {/* Details Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("paymentDetails")}</DialogTitle>
+          </DialogHeader>
+          {selectedPayment && (
+            <div className="space-y-4">
+              <p>
+                <strong>{t("id")}:</strong> {selectedPayment.id}
+              </p>
+              <p>
+                <strong>{t("name")}:</strong>{" "}
+                {selectedPayment.user?.name || "-"}
+              </p>
+              <p>
+                <strong>{t("email")}:</strong>{" "}
+                {selectedPayment.user?.email || "-"}
+              </p>
+              <p>
+                <strong>{t("amount")}:</strong>{" "}
+                {typeof selectedPayment.how_much === "number"
+                  ? `${selectedPayment.how_much.toFixed(2)}`
+                  : "-"}
+              </p>
+              <p>
+                <strong>{t("currency")}:</strong>{" "}
+                {selectedPayment.currency || "-"}
+              </p>
+              <p>
+                <strong>{t("coin")}:</strong> {selectedPayment.coin || "-"}
+              </p>
+              <p>
+                <strong>{t("card")}:</strong> {selectedPayment.card || "-"}
+              </p>
+              <p>
+                <strong>{t("status")}:</strong> {selectedPayment.status}
+              </p>
+              <p>
+                <strong>{t("date")}:</strong>{" "}
+                {selectedPayment.date
+                  ? new Date(selectedPayment.date).toLocaleString()
+                  : "-"}
+              </p>
+              <p>
+                <strong>{t("userHistory")}:</strong>
+                <ul className="list-disc ml-5">
+                  <li>
+                    {t("role")}: {selectedPayment.user?.role || "-"}
+                  </li>
+                  <li>
+                    {t("createdAt")}:{" "}
+                    {new Date(
+                      selectedPayment.user?.createdAt
+                    ).toLocaleString() || "-"}
+                  </li>
+                  <li>
+                    {t("isActive")}:{" "}
+                    {selectedPayment.user?.isActive ? t("yes") : t("no")}
+                  </li>
+                </ul>
+              </p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

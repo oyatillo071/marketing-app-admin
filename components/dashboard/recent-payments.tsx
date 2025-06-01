@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type RecentPaymentsProps = {
   data: Array<{
-    id: string
+    id: string;
     user: {
-      name: string
-      initials: string
-    }
-    amount: number
-    status: string
-    date: string
-  }>
-}
+      name: string;
+      initials: string;
+    };
+    amount: number;
+    status: string;
+    date: string;
+  }>;
+};
 
 export function RecentPayments({ data }: RecentPaymentsProps) {
   if (!data || data.length === 0) {
@@ -33,7 +33,7 @@ export function RecentPayments({ data }: RecentPaymentsProps) {
           </div>
         ))}
       </div>
-    )
+    );
   }
 
   return (
@@ -44,13 +44,19 @@ export function RecentPayments({ data }: RecentPaymentsProps) {
             <AvatarFallback>{payment.user.initials}</AvatarFallback>
           </Avatar>
           <div className="ml-4 space-y-1">
-            <p className="text-sm font-medium leading-none">{payment.user.name}</p>
+            <p className="text-sm font-medium leading-none">
+              {payment.user.name}
+            </p>
             <p className="text-sm text-muted-foreground">{payment.date}</p>
           </div>
-          <div className="ml-auto font-medium">${payment.amount.toFixed(2)}</div>
+          <div className="ml-auto font-medium">
+            {typeof payment.amount === "number"
+              ? `$${payment.amount.toFixed(2)}`
+              : "-"}
+          </div>
           <Badge className="ml-2 bg-green-500">{payment.status}</Badge>
         </div>
       ))}
     </div>
-  )
+  );
 }

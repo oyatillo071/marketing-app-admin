@@ -144,22 +144,43 @@ export const unblockUser = async (id: string) => {
 
 // Payments
 export const fetchPayments = async () => {
-  if (true) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return mockData.payments;
-  }
-
   const response = await api.get("/payments");
   return response.data;
 };
 
+export async function fetchUserPayments() {
+  const { data } = await api(`/payments/user`);
+  return data;
+}
+
+export async function fetchPaymentById(id: string | number) {
+  const { data } = await api(`/payments/${id}`);
+  return data;
+}
+
+export async function fetchPaymentsByStatus(status: string) {
+  const { data } = await api(`/payments/status/${status}`);
+  return data;
+}
+// Check payment status and reason
+export async function checkPayment({
+  id,
+  status,
+  reason,
+}: {
+  id: string | number;
+  status: string;
+  reason?: string;
+}) {
+  const { data } = await axios.post(`/payments/checked`, {
+    id,
+    status,
+    reason,
+  });
+  return data;
+}
 // Withdrawals
 export const fetchWithdrawals = async () => {
-  if (true) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return mockData.withdrawals;
-  }
-
   const response = await api.get("/payments");
   return response.data;
 };
@@ -212,9 +233,9 @@ export const createTariff = async (data: any) => {
   return response.data;
 };
 
-export const updateTariff = async (id: string|number, data: any) => {
+export const updateTariff = async (id: string | number, data: any) => {
   console.log("Updating tariff with data:", id, data);
-  
+
   const response = await api.put(`/tariff/update/${id}`, data);
   return response.data;
 };
@@ -226,8 +247,6 @@ export const deleteTariff = async (id: string) => {
 
 // Notifications
 export const fetchNotifications = async () => {
-  
-
   const response = await api.get("/notification");
   return response.data;
 };
@@ -340,7 +359,7 @@ export const updateProduct = async (id: string, data: any) => {
   return response.data;
 };
 
-export const deleteProduct = async (id: string|number) => {
+export const deleteProduct = async (id: string | number) => {
   const response = await api.delete(`/products/${id}`);
   return response.data;
 };

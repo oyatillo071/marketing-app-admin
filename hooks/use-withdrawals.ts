@@ -14,19 +14,37 @@ export function useWithdrawals() {
   const triedRef = useRef(false);
 
   const {
-    data = [],
+    data: rawData = [],
     isLoading,
     error,
   } = useQuery({
     queryKey: ["withdrawals"],
-    queryFn: () => {
-      if (triedRef.current) {
-        return [];
-      }
-      return fetchWithdrawals().catch(() => {
-        triedRef.current = true;
-        return [];
-      });
+    queryFn: async () => {
+      if (triedRef.current) return [];
+      const data = await fetchWithdrawals();
+      // Transform backend response to Withdrawal[]
+      return data.map((item: any) => ({
+        id: String(item.id),
+        user: {
+          id: String(item.user.id),
+          name: item.user.name,
+          initials: item.user.name
+            .split(" ")
+            .map((n: string) => n[0])
+            .join(""),
+        },
+        amount: item.how_much,
+        cardNumber: item.card || "",
+        status:
+          item.status === "SENDING"
+            ? "Kutilmoqda"
+            : item.status === "CANCELLED"
+            ? "Rad etilgan"
+            : "To'langan",
+        date: item.to_send_date,
+        reason: item.reason || "",
+        processedBy: undefined, // Agar admin ma'lumotlari bo'lsa, shu yerda to'ldiring
+      }));
     },
   });
 
@@ -79,7 +97,7 @@ export function useWithdrawals() {
   }
 
   return {
-    data,
+    data: rawData,
     isLoading,
     error,
     processWithdrawal: (id: string) => processMutation.mutate(id),
