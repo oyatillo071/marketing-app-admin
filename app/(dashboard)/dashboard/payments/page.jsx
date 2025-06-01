@@ -19,11 +19,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Download, Loader2, Search } from "lucide-react";
+import { Download, EyeIcon, Loader2, Search } from "lucide-react";
 import { useState } from "react";
 import { exportToPDF } from "@/lib/pdf-export";
 import { useLanguage } from "@/contexts/language-context";
 import Link from "next/link";
+import Image from "next/image";
+import { ZoomedImageDialog } from "@/components/ZoomedImageDialog";
 
 export default function PaymentsPage() {
   const { t } = useLanguage();
@@ -31,6 +33,7 @@ export default function PaymentsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [zoomedImage, setZoomedImage] = useState(null);
 
   const filteredPayments = payments.filter(
     (payment) =>
@@ -139,8 +142,8 @@ export default function PaymentsPage() {
                       <Badge className="bg-green-500">{payment.status}</Badge>
                     </TableCell>
                     <TableCell>
-                      {payment.date
-                        ? new Date(payment.date).toLocaleString()
+                      {payment.to_send_date
+                        ? new Date(payment.to_send_date).toLocaleString()
                         : "-"}
                     </TableCell>
                     <TableCell>
@@ -149,7 +152,7 @@ export default function PaymentsPage() {
                         size="sm"
                         onClick={() => openDetailsDialog(payment)}
                       >
-                        {t("details")}
+                        <EyeIcon />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -166,6 +169,13 @@ export default function PaymentsPage() {
         </div>
       )}
 
+      {/* Zoomed Image Dialog */}
+      <ZoomedImageDialog
+        isOpen={!!zoomedImage}
+        onClose={() => setZoomedImage(null)}
+        imageUrl={zoomedImage}
+      />
+
       {/* Details Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
@@ -174,6 +184,25 @@ export default function PaymentsPage() {
           </DialogHeader>
           {selectedPayment && (
             <div className="space-y-4">
+              <div className="relative h-48 w-full mb-4">
+                {selectedPayment.photo_url ? (
+                  <Image
+                    src={selectedPayment.photo_url}
+                    alt="payment img"
+                    fill
+                    onClick={() => setZoomedImage(selectedPayment.photo_url)}
+                    className="object-cover cursor-pointer"
+                  />
+                ) : (
+                  <Image
+                    src={"/default-img.jpg"}
+                    alt="default img"
+                    fill
+                    onClick={() => setZoomedImage("/default-img.jpg")}
+                    className="object-cover cursor-pointer"
+                  />
+                )}
+              </div>
               <p>
                 <strong>{t("id")}:</strong> {selectedPayment.id}
               </p>
@@ -206,11 +235,11 @@ export default function PaymentsPage() {
               </p>
               <p>
                 <strong>{t("date")}:</strong>{" "}
-                {selectedPayment.date
-                  ? new Date(selectedPayment.date).toLocaleString()
+                {selectedPayment.to_send_date
+                  ? new Date(selectedPayment.to_send_date).toLocaleString()
                   : "-"}
               </p>
-              <p>
+              <div>
                 <strong>{t("userHistory")}:</strong>
                 <ul className="list-disc ml-5">
                   <li>
@@ -218,16 +247,18 @@ export default function PaymentsPage() {
                   </li>
                   <li>
                     {t("createdAt")}:{" "}
-                    {new Date(
-                      selectedPayment.user?.createdAt
-                    ).toLocaleString() || "-"}
+                    {selectedPayment.user?.createdAt
+                      ? new Date(
+                          selectedPayment.user.createdAt
+                        ).toLocaleString()
+                      : "-"}
                   </li>
                   <li>
                     {t("isActive")}:{" "}
                     {selectedPayment.user?.isActive ? t("yes") : t("no")}
                   </li>
                 </ul>
-              </p>
+              </div>
             </div>
           )}
         </DialogContent>
