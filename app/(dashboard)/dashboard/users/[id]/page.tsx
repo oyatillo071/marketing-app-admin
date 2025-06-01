@@ -15,7 +15,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Download, Edit, Trash } from "lucide-react";
+import { ArrowLeft, Download, Edit, Trash, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { exportToPDF } from "@/lib/pdf-export";
@@ -40,6 +40,10 @@ import {
 import { usePayments } from "@/hooks/use-payments";
 import { useWithdrawals } from "@/hooks/use-withdrawals";
 import { usePathname } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+
 export default function UserDetailPage() {
   const pathname = usePathname();
   const segments = pathname?.split("/") ?? [];
@@ -56,6 +60,9 @@ export default function UserDetailPage() {
   const { data: allWithdrawals } = useWithdrawals();
   const [userPayments, setUserPayments] = useState<any[]>([]);
   const [userWithdrawals, setUserWithdrawals] = useState<any[]>([]);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editForm, setEditForm] = useState<any>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (allPayments && user) {
@@ -74,6 +81,20 @@ export default function UserDetailPage() {
       setUserWithdrawals(filteredWithdrawals);
     }
   }, [allWithdrawals, user]);
+
+  useEffect(() => {
+    if (user) {
+      setEditForm({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+        coin: user.coin,
+        status: user.status || "base",
+        dailyEarnings: user.dailyEarnings || 0,
+      });
+    }
+  }, [user]);
 
   const handleExportUserData = () => {
     if (user) {
@@ -136,6 +157,28 @@ export default function UserDetailPage() {
     deleteUser(id);
     setIsDeleteDialogOpen(false);
     router.push("/dashboard/users");
+  };
+
+  const { updateUser } = useUsers();
+
+  const handleEditChange = (field: string, value: any) => {
+    setEditForm((prev: any) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      await updateUser(user.id, editForm);
+      setIsEditDialogOpen(false);
+    } catch (error) {
+      // error handling
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (isLoading) {
@@ -231,11 +274,13 @@ export default function UserDetailPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" asChild>
-            <Link href={`/dashboard/users/${user.id}/edit`}>
-              <Edit className="mr-2 h-4 w-4" />
-              {t("edit")}
-            </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsEditDialogOpen(true)}
+          >
+            <Edit className="mr-2 h-4 w-4" />
+            {t("edit")}
           </Button>
           <Button
             variant="destructive"
@@ -267,38 +312,22 @@ export default function UserDetailPage() {
                   <div>{user.id}</div>
                   <div className="font-medium">{t("name")}</div>
                   <div>{user.name}</div>
-                  <div className="font-medium">{t("phone")}</div>
-                  <div>{user.phone}</div>
                   <div className="font-medium">{t("email")}</div>
                   <div>{user.email}</div>
-                  <div className="font-medium">{t("tariff")}</div>
+                  <div className="font-medium">{t("role")}</div>
+                  <div>{user.role}</div>
+                  <div className="font-medium">{t("isActive")}</div>
                   <div>
                     <Badge
-                      className={
-                        user.tariff === "Premium"
-                          ? "bg-red-500"
-                          : user.tariff === "Standard"
-                          ? "bg-green-500"
-                          : "bg-gray-500"
-                      }
+                      className={user.isActive ? "bg-green-500" : "bg-red-500"}
                     >
-                      {user.tariff}
+                      {user.isActive ? t("active") : t("inactive")}
                     </Badge>
                   </div>
-                  <div className="font-medium">{t("status")}</div>
-                  <div>
-                    <Badge
-                      className={
-                        user.isActive === "Faol" ? "bg-green-500" : "bg-red-500"
-                      }
-                    >
-                      {user.isActive}
-                    </Badge>
-                  </div>
-                  <div className="font-medium">{t("balance")}</div>
-                  <div>${user.balance}</div>
+                  <div className="font-medium">{t("coin")}</div>
+                  <div>{user.coin}</div>
                   <div className="font-medium">{t("registrationDate")}</div>
-                  <div>{user.registrationDate}</div>
+                  <div>{new Date(user.createdAt).toLocaleString()}</div>
                 </div>
               </CardContent>
               <CardFooter>
@@ -488,6 +517,111 @@ export default function UserDetailPage() {
               {t("delete")}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* EDIT USER DIALOG */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t("edit")} {t("user")}
+            </DialogTitle>
+            <DialogDescription>{t("editUserDescription")}</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">{t("name")}</Label>
+                <Input
+                  id="name"
+                  value={editForm?.name || ""}
+                  onChange={(e) => handleEditChange("name", e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">{t("email")}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={editForm?.email || ""}
+                  onChange={(e) => handleEditChange("email", e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="role">{t("role")}</Label>
+                <Input
+                  id="role"
+                  value={editForm?.role || ""}
+                  onChange={(e) => handleEditChange("role", e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="coin">{t("coin")}</Label>
+                <Input
+                  id="coin"
+                  type="number"
+                  value={editForm?.coin ?? 0}
+                  onChange={(e) =>
+                    handleEditChange("coin", Number(e.target.value))
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="status">{t("status")}</Label>
+                <select
+                  id="status"
+                  className="w-full rounded-md border px-3 py-2 text-sm"
+                  value={editForm?.status || "base"}
+                  onChange={(e) => handleEditChange("status", e.target.value)}
+                  required
+                >
+                  <option value="base">Base</option>
+                  <option value="vip">VIP</option>
+                  <option value="vvip">VVIP</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="dailyEarnings">{t("dailyEarnings")}</Label>
+                <Input
+                  id="dailyEarnings"
+                  type="number"
+                  value={editForm?.dailyEarnings ?? 0}
+                  onChange={(e) =>
+                    handleEditChange("dailyEarnings", Number(e.target.value))
+                  }
+                  required
+                />
+              </div>
+              <div className="flex items-center justify-between space-y-0 pt-5">
+                <Label htmlFor="isActive">{t("active")}</Label>
+                <Switch
+                  id="isActive"
+                  checked={!!editForm?.isActive}
+                  onCheckedChange={(checked) =>
+                    handleEditChange("isActive", checked)
+                  }
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => setIsEditDialogOpen(false)}
+              >
+                {t("cancel")}
+              </Button>
+              <Button type="submit" disabled={isSaving}>
+                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {t("save")}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { ThemeProvider } from "@/components/theme-provider"
-import { QueryClientProvider } from "@/components/query-client-provider"
-import { LanguageProvider } from "@/contexts/language-context"
-import { NotificationProvider } from "@/components/notification-provider"
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { QueryClientProvider } from "@/components/providers/query-client-provider";
+import { LanguageProvider } from "@/contexts/language-context";
+import { NotificationProvider } from "@/components/providers/notification-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -16,5 +16,5 @@ export function Providers({ children }: { children: React.ReactNode }) {
         </LanguageProvider>
       </ThemeProvider>
     </QueryClientProvider>
-  )
+  );
 }

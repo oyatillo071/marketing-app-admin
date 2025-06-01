@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useNotification } from "@/components/notification-provider";
+import { useNotification } from "@/components/providers/notification-provider";
 import { useLanguage } from "@/contexts/language-context";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";

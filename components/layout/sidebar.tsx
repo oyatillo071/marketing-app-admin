@@ -14,6 +14,9 @@ import {
   UserCircle,
   Menu,
   X,
+  UserPlus,
+  ChevronDown,
+  Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/language-context";
@@ -29,33 +32,87 @@ import {
 import { useState, memo } from "react";
 import { useRouter } from "next/navigation";
 
-// Memo-ized sidebar link component to prevent unnecessary re-renders
+// Add new interface for sidebar items with children
+interface SidebarItem {
+  title: string;
+  href?: string;
+  icon: any;
+  children?: SidebarItem[];
+}
+
+// Modify SidebarLink component to handle nested items
 const SidebarLink = memo(
   ({
     item,
     pathname,
     onLinkClick,
+    level = 0,
   }: {
-    item: { title: string; href: string; icon: any };
-    pathname: any;
+    item: SidebarItem;
+    pathname: string;
     onLinkClick: () => void;
+    level?: number;
   }) => {
+    const [isOpen, setIsOpen] = useState(false);
     const Icon = item.icon;
+    const hasChildren = item.children && item.children.length > 0;
+
+    const isActive = item.href
+      ? pathname === item.href
+      : item.children?.some((child) => pathname === child.href);
+
+    const handleClick = () => {
+      if (hasChildren) {
+        setIsOpen(!isOpen);
+      } else {
+        onLinkClick();
+      }
+    };
 
     return (
-      <Link
-        href={item.href}
-        onClick={onLinkClick}
-        className={cn(
-          "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-          pathname === item.href
-            ? "bg-secondary-bg text-white"
-            : "text-muted-foreground hover:bg-secondary-bg hover:text-white"
+      <div>
+        <div
+          onClick={handleClick}
+          className={cn(
+            "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors cursor-pointer",
+            isActive
+              ? "bg-secondary-bg text-white"
+              : "text-muted-foreground hover:bg-secondary-bg hover:text-white",
+            level > 0 && "ml-6"
+          )}
+        >
+          <Icon className="h-5 w-5" />
+          <span className="flex-1">{item.title}</span>
+          {hasChildren && (
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 transition-transform",
+                isOpen && "transform rotate-180"
+              )}
+            />
+          )}
+        </div>
+        {hasChildren && isOpen && (
+          <div className="mt-1">
+            {item?.children?.map((child) => (
+              <Link
+                key={child.href}
+                href={child.href || "#"}
+                onClick={onLinkClick}
+                className={cn(
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ml-6",
+                  pathname === child.href
+                    ? "bg-secondary-bg text-white"
+                    : "text-muted-foreground hover:bg-secondary-bg hover:text-white"
+                )}
+              >
+                {child.icon && <child.icon className="h-5 w-5" />}
+                <span>{child.title}</span>
+              </Link>
+            ))}
+          </div>
         )}
-      >
-        <Icon className="h-5 w-5" />
-        <span>{item.title}</span>
-      </Link>
+      </div>
     );
   }
 );
@@ -88,7 +145,7 @@ export function Sidebar() {
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const sidebarItems = [
+  const sidebarItems: SidebarItem[] = [
     {
       title: t("dashboard"),
       href: "/dashboard",
@@ -96,13 +153,35 @@ export function Sidebar() {
     },
     {
       title: t("users"),
-      href: "/dashboard/users",
       icon: Users,
+      children: [
+        {
+          title: t("allUsers"),
+          href: "/dashboard/users",
+          icon: Users,
+        },
+        {
+          title: t("addUser"),
+          href: "/dashboard/users/add",
+          icon: UserPlus,
+        },
+      ],
     },
     {
       title: t("payments"),
-      href: "/dashboard/payments",
       icon: CreditCard,
+      children: [
+        {
+          title: t("allPayments"),
+          href: "/dashboard/payments",
+          icon: CreditCard,
+        },
+        {
+          title: t("paymentRequests"),
+          href: "/dashboard/payments/payment-socket",
+          icon: Bell,
+        },
+      ],
     },
     {
       title: t("withdrawals"),
@@ -110,14 +189,20 @@ export function Sidebar() {
       icon: Wallet,
     },
     {
-      title: t("tariffs"),
-      href: "/dashboard/tariffs",
-      icon: Package,
-    },
-    {
       title: t("products"),
-      href: "/dashboard/products",
       icon: Package,
+      children: [
+        {
+          title: t("allProducts"),
+          href: "/dashboard/products",
+          icon: Package,
+        },
+        {
+          title: t("addProduct"),
+          href: "/dashboard/products/add",
+          icon: Plus,
+        },
+      ],
     },
     {
       title: t("statistics"),
@@ -202,7 +287,7 @@ export function Sidebar() {
           <nav className="space-y-1 px-2">
             {sidebarItems.map((item) => (
               <SidebarLink
-                key={item.href}
+                key={item.href || item.title}
                 item={item}
                 pathname={pathname}
                 onLinkClick={handleLinkClick}

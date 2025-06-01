@@ -396,62 +396,67 @@ export default function UsersPage() {
                   </td>
                 </tr>
               ) : (
-                filteredUsers.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="border-b hover:bg-muted/30 transition"
-                  >
-                    <td className="px-2 py-2">{user.id}</td>
-                    <td className="px-2 py-2">{user.name}</td>
-                    <td className="px-2 py-2">{user.email}</td>
-                    <td className="px-2 py-2">{user.role}</td>
-                    <td className="px-2 py-2">
-                      {user.balance == 0 ? null : user.balance}
-                    </td>
-                    <td className="px-2 py-2">
-                      {new Date(user.createdAt).toLocaleString()}
-                    </td>
-                    <td className="px-2 py-2">
-                      {user.isActive ? (
-                        <span className="text-green-600 font-semibold">
-                          {t("active")}
-                        </span>
-                      ) : (
-                        <span className="text-red-600 font-semibold">
-                          {t("blocked")}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-2 py-2 flex gap-2 items-center">
-                      <Link
-                        className="border rounded-md p-2 border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                        href={`/dashboard/users/${user.id}`}
-                        aria-label={`View details of user ${user.name}`}
-                      >
-                        <EyeIcon className="w-5 h-5" />
-                      </Link>
+                filteredUsers
+                  .filter(
+                    (user) =>
+                      user.role !== "SUPERADMIN" && user.role !== "ADMIN"
+                  )
+                  .map((user) => (
+                    <tr
+                      key={user.id}
+                      className="border-b hover:bg-muted/30 transition"
+                    >
+                      <td className="px-2 py-2">{user.id}</td>
+                      <td className="px-2 py-2">{user.name}</td>
+                      <td className="px-2 py-2">{user.email}</td>
+                      <td className="px-2 py-2">{user.role}</td>
+                      <td className="px-2 py-2">
+                        {user.balance == 0 ? null : user.balance}
+                      </td>
+                      <td className="px-2 py-2">
+                        {new Date(user.createdAt).toLocaleString()}
+                      </td>
+                      <td className="px-2 py-2">
+                        {user.isActive ? (
+                          <span className="text-green-600 font-semibold">
+                            {t("active")}
+                          </span>
+                        ) : (
+                          <span className="text-red-600 font-semibold">
+                            {t("blocked")}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-2 py-2 flex gap-2 items-center">
+                        <Link
+                          className="border rounded-md p-2 border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                          href={`/dashboard/users/${user.id}`}
+                          aria-label={`View details of user ${user.name}`}
+                        >
+                          <EyeIcon className="w-5 h-5" />
+                        </Link>
 
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() =>
-                          user.isActive
-                            ? handleBlockUser(user.id)
-                            : handleUnblockUser(user.id)
-                        }
-                      >
-                        {user.isActive ? t("block") : t("unblock")}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleDeleteUser(user.id)}
-                      >
-                        <TrashIcon className="w-5 h-5" />
-                      </Button>
-                    </td>
-                  </tr>
-                ))
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            user.isActive
+                              ? handleBlockUser(user.id)
+                              : handleUnblockUser(user.id)
+                          }
+                        >
+                          {user.isActive ? t("block") : t("unblock")}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDeleteUser(user.id)}
+                        >
+                          <TrashIcon className="w-5 h-5" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
               )}
             </tbody>
           </table>

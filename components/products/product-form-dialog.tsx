@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/language-context";
 import { useState } from "react";
-import { languages } from "../language-switcher";
+import { languages } from "../providers/language-switcher";
 import Image from "next/image";
 import { uploadMultImage } from "@/lib/api";
 import { toast } from "sonner";
@@ -132,7 +132,9 @@ export function ProductFormDialog({
 
     let uploadedPhotos = Array.isArray(photoUrls)
       ? photoUrls
-          .filter((p) => typeof p?.photo_url === "string" && p.photo_url.trim() !== "")
+          .filter(
+            (p) => typeof p?.photo_url === "string" && p.photo_url.trim() !== ""
+          )
           .map((p) => ({ photo_url: p.photo_url }))
       : [];
 
@@ -144,7 +146,10 @@ export function ProductFormDialog({
         // uploadMultImage har doim [{ photo_url: "..." }] formatida qaytadi
         const formatted = Array.isArray(data)
           ? data
-              .filter((p) => typeof p?.photo_url === "string" && p.photo_url.trim() !== "")
+              .filter(
+                (p) =>
+                  typeof p?.photo_url === "string" && p.photo_url.trim() !== ""
+              )
               .map((p) => ({ photo_url: p.photo_url }))
           : [];
 
@@ -373,7 +378,9 @@ export function ProductFormDialog({
               <div key={idx} className="flex gap-2 mb-2">
                 <select
                   value={price.currency}
-                  onChange={(e) => handlePriceChange(idx, "currency", e.target.value)}
+                  onChange={(e) =>
+                    handlePriceChange(idx, "currency", e.target.value)
+                  }
                   className="border rounded px-2 py-1"
                   required
                 >

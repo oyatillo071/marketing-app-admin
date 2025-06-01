@@ -1,10 +1,10 @@
 // "use client";
 import type React from "react";
-import { Sidebar } from "@/components/sidebar";
-import { ModeToggle } from "@/components/mode-toggle";
-import { LanguageSwitcher } from "@/components/language-switcher";
-import { NotificationBell } from "@/components/notification-bell";
-import { UserProfile } from "@/components/user-profile";
+import { Sidebar } from "@/components/layout/sidebar";
+import { ModeToggle } from "@/components/providers/mode-toggle";
+import { LanguageSwitcher } from "@/components/providers/language-switcher";
+import { NotificationBell } from "@/components/layout/notification-bell";
+import { UserProfile } from "@/components/providers/user-profile";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 export default function DashboardLayout({

@@ -1,69 +1,81 @@
-"use client"
+"use client";
 
-import React from "react"
+import React from "react";
 
-import { useUser } from "@/hooks/use-users"
-import { useLanguage } from "@/contexts/language-context"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { ArrowLeft, Loader2 } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { useUsers } from "@/hooks/use-users"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
+import { useUser } from "@/hooks/use-users";
+import { useLanguage } from "@/contexts/language-context";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useUsers } from "@/hooks/use-users";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 export default function UserEditPage({ params }: { params: { id: string } }) {
-  const { t } = useLanguage()
-  const router = useRouter()
-  const { data: user, isLoading } = useUser(params.id)
-  const { updateUser } = useUsers()
-  const [isSaving, setIsSaving] = useState(false)
-  const [formData, setFormData] = useState<any>(null)
+  const { t } = useLanguage();
+  const router = useRouter();
+  const { data: user, isLoading } = useUser(params.id);
+  const { updateUser } = useUsers();
+  const [isSaving, setIsSaving] = useState(false);
+  const [formData, setFormData] = useState<any>(null);
 
   // Initialize form data when user data is loaded
-  useState
+  useState;
   React.useEffect(() => {
     if (user) {
       setFormData({
         name: user.name,
-        phone: user.phone,
         email: user.email,
-        tariff: user.tariff,
-        status: user.status === "Faol",
-        balance: user.balance,
-      })
+        role: user.role,
+        isActive: user.isActive,
+        coin: user.coin,
+      });
     }
-  }, [user])
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsSaving(true)
+    e.preventDefault();
+    setIsSaving(true);
 
     const updatedUser = {
       ...formData,
-      status: formData.status ? "Faol" : "Nofaol",
-    }
+      isActive: formData.isActive ? "Faol" : "Nofaol",
+    };
 
     try {
-      await updateUser(params.id, updatedUser)
-      router.push(`/dashboard/users/${params.id}`)
+      await updateUser(params.id, updatedUser);
+      router.push(`/dashboard/users/${params.id}`);
     } catch (error) {
-      console.error("Error updating user:", error)
+      console.error("Error updating user:", error);
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleChange = (field: string, value: any) => {
     setFormData((prev: any) => ({
       ...prev,
       [field]: value,
-    }))
-  }
+    }));
+  };
 
   if (isLoading || !formData) {
     return (
@@ -80,7 +92,7 @@ export default function UserEditPage({ params }: { params: { id: string } }) {
         </div>
         <Skeleton className="h-[500px] w-full" />
       </div>
-    )
+    );
   }
 
   if (!user) {
@@ -94,13 +106,18 @@ export default function UserEditPage({ params }: { params: { id: string } }) {
         </div>
         <div className="flex flex-col items-center justify-center h-[50vh]">
           <h2 className="text-2xl font-bold">{t("userNotFound")}</h2>
-          <p className="text-muted-foreground">{t("userNotFoundDescription")}</p>
-          <Button className="mt-4" onClick={() => router.push("/dashboard/users")}>
+          <p className="text-muted-foreground">
+            {t("userNotFoundDescription")}
+          </p>
+          <Button
+            className="mt-4"
+            onClick={() => router.push("/dashboard/users")}
+          >
             {t("backToUsers")}
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -135,15 +152,6 @@ export default function UserEditPage({ params }: { params: { id: string } }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">{t("phone")}</Label>
-                <Input
-                  id="phone"
-                  value={formData.phone}
-                  onChange={(e) => handleChange("phone", e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="email">{t("email")}</Label>
                 <Input
                   id="email"
@@ -154,41 +162,42 @@ export default function UserEditPage({ params }: { params: { id: string } }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="tariff">{t("tariff")}</Label>
-                <Select value={formData.tariff} onValueChange={(value) => handleChange("tariff", value)}>
-                  <SelectTrigger id="tariff">
-                    <SelectValue placeholder={t("selectTariff")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Premium">Premium</SelectItem>
-                    <SelectItem value="Standard">Standard</SelectItem>
-                    <SelectItem value="Basic">Basic</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="role">{t("role")}</Label>
+                <Input
+                  id="role"
+                  value={formData.role}
+                  onChange={(e) => handleChange("role", e.target.value)}
+                  required
+                />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="balance">{t("balance")}</Label>
+                <Label htmlFor="coin">{t("coin")}</Label>
                 <Input
-                  id="balance"
+                  id="coin"
                   type="number"
-                  step="0.01"
-                  value={formData.balance}
-                  onChange={(e) => handleChange("balance", Number(e.target.value))}
+                  value={formData.coin}
+                  onChange={(e) => handleChange("coin", Number(e.target.value))}
                   required
                 />
               </div>
               <div className="flex items-center justify-between space-y-0 pt-5">
-                <Label htmlFor="status">{t("active")}</Label>
+                <Label htmlFor="isActive">{t("active")}</Label>
                 <Switch
-                  id="status"
-                  checked={formData.status}
-                  onCheckedChange={(checked) => handleChange("status", checked)}
+                  id="isActive"
+                  checked={formData.isActive}
+                  onCheckedChange={(checked) =>
+                    handleChange("isActive", checked)
+                  }
                 />
               </div>
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button variant="outline" type="button" onClick={() => router.back()}>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => router.back()}
+            >
               {t("cancel")}
             </Button>
             <Button type="submit" disabled={isSaving}>
@@ -199,5 +208,5 @@ export default function UserEditPage({ params }: { params: { id: string } }) {
         </Card>
       </form>
     </div>
-  )
+  );
 }

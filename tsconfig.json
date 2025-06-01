@@ -28,12 +28,13 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/layout.jsx",
-    "components/notification-bell.jsx",
+    "components/layout/notification-bell.jsx",
     "app/(dashboard)/dashboard/users/page.tsx",
     "components/users/users-table.tsx",
     "components/notifications/notifications-form.tsx",
     "components/notifications/notifications-table.tsx",
-    "app/(dashboard)/dashboard/payments/page.jsx"
+    "app/(dashboard)/dashboard/payments/page.jsx",
+    "app/(dashboard)/dashboard/payments/payment-socket/page.jsx"
   ],
   "exclude": ["node_modules"]
 }

@@ -1,22 +1,67 @@
 import { useLanguage } from "@/contexts/language-context";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ProductFormDialog } from "./product-form-dialog";
 import { useProducts } from "@/hooks/use-products";
 import { PencilIcon, Trash2 } from "lucide-react";
 
+const PAGE_SIZE = 10;
+
 export function ProductsTable() {
   const { t, language } = useLanguage();
   const { data, updateProduct, deleteProduct } = useProducts();
+
+  // Dialog state
   const [editDialog, setEditDialog] = useState<{
     open: boolean;
     product: any | null;
   }>({ open: false, product: null });
-
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     productId: string | null;
   }>({ open: false, productId: null });
+
+  // Universal search state
+  const [search, setSearch] = useState("");
+
+  // Pagination state
+  const [page, setPage] = useState(1);
+
+  // Universal search: id, nomi, narxi, reytingi, otzivi bo‘yicha
+  const filteredData = useMemo(() => {
+    let filtered = data || [];
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      filtered = filtered.filter((p: any) => {
+        const name = (
+          p.translations?.find((tr: any) => tr.language === language)?.name ||
+          p.translations?.[0]?.name ||
+          ""
+        ).toLowerCase();
+        const price = (
+          p.prices?.map((pr: any) => String(pr.value)).join(" ") || ""
+        ).toLowerCase();
+        const rating = String(p.rating || "").toLowerCase();
+        const rewiev = String(p.rewiev || "").toLowerCase();
+        const id = String(p.id || "").toLowerCase();
+        return (
+          id.includes(q) ||
+          name.includes(q) ||
+          price.includes(q) ||
+          rating.includes(q) ||
+          rewiev.includes(q)
+        );
+      });
+    }
+    return filtered;
+  }, [data, search, language]);
+
+  // Pagination
+  const pageCount = Math.ceil(filteredData.length / PAGE_SIZE);
+  const paginatedData = filteredData.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE
+  );
 
   const handleDelete = async () => {
     if (confirmDialog.productId) {
@@ -28,7 +73,23 @@ export function ProductsTable() {
   if (!data) return <div className="text-center py-10">{t("loading")}</div>;
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+    <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm p-4">
+      {/* Universal search */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        <input
+          className="border px-2 py-1 rounded"
+          placeholder={
+            t("searchUniversal") ||
+            "ID, nomi, narxi, reytingi yoki otzivi bo‘yicha qidirish"
+          }
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+        />
+      </div>
+
       <table className="min-w-full table-auto text-sm text-left">
         <thead className="bg-gray-100 text-gray-700">
           <tr>
@@ -41,7 +102,7 @@ export function ProductsTable() {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {data.map((product: any) => (
+          {paginatedData.map((product: any) => (
             <tr key={product.id} className="hover:bg-gray-50">
               <td className="px-4 py-2">{product.id}</td>
               <td className="px-4 py-2">
@@ -79,6 +140,32 @@ export function ProductsTable() {
         </tbody>
       </table>
 
+      {/* Pagination */}
+      <div className="flex justify-between items-center mt-4">
+        <span>
+          {t("page") || "Sahifa"} {page} / {pageCount || 1}
+        </span>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={page === 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+          >
+            {t("prev") || "Oldingi"}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={page === pageCount || pageCount === 0}
+            onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+          >
+            {t("next") || "Keyingi"}
+          </Button>
+        </div>
+      </div>
+
+      {/* Edit dialog */}
       {editDialog.open && (
         <ProductFormDialog
           open={editDialog.open}
@@ -93,6 +180,7 @@ export function ProductsTable() {
         />
       )}
 
+      {/* Delete confirm dialog */}
       {confirmDialog.open && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-sm">
@@ -100,14 +188,13 @@ export function ProductsTable() {
             <div className="flex justify-end space-x-2">
               <Button
                 variant="outline"
-                onClick={() => setConfirmDialog({ open: false, productId: null })}
+                onClick={() =>
+                  setConfirmDialog({ open: false, productId: null })
+                }
               >
                 {t("cancel")}
               </Button>
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-              >
+              <Button variant="destructive" onClick={handleDelete}>
                 {t("delete")}
               </Button>
             </div>
