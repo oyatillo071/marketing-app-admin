@@ -4,10 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/language-context";
 import { useState } from "react";
-import { languages } from "../providers/language-switcher";
+
 import Image from "next/image";
 import { uploadMultImage } from "@/lib/api";
 import { toast } from "sonner";
+import { languages } from "../providers/language-switcher";
 
 export function ProductFormDialog({
   open,

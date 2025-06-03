@@ -24,7 +24,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { languages } from "@/components/language-switcher";
+import { languages } from "@/components/providers/language-switcher";
 import Link from "next/link";
 
 const cardTypes = ["click", "uzcard", "humo"];
