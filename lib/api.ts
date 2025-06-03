@@ -355,7 +355,7 @@ export const createProduct = async (data: any) => {
 };
 
 export const updateProduct = async (id: string, data: any) => {
-  const response = await api.patch(`/product/${id}`, data);
+  const response = await api.patch(`/products/${id}`, data);
   return response.data;
 };
 

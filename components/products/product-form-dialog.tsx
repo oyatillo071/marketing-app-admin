@@ -37,12 +37,8 @@ export function ProductFormDialog({
     })
   );
 
-  // Prices state
-  const [prices, setPrices] = useState(
-    initialData?.prices?.length
-      ? initialData.prices
-      : [{ currency: "", value: "" }]
-  );
+  // Coin state
+  const [coin, setCoin] = useState(initialData?.coin || "");
 
   // Photo state: {file: File, preview: string}[] for new, {photo_url: string}[] for existing
   const [photoFiles, setPhotoFiles] = useState<
@@ -57,6 +53,9 @@ export function ProductFormDialog({
   const [rating, setRating] = useState(initialData?.rating || "");
   const [rewiev, setRewiev] = useState(initialData?.rewiev || "");
 
+  // Yangi state: URL input uchun
+  const [photoUrlInput, setPhotoUrlInput] = useState("");
+
   // Handle translation change
   const handleTranslationChange = (
     lang: string,
@@ -67,20 +66,6 @@ export function ProductFormDialog({
       prev.map((tr) => (tr.language === lang ? { ...tr, [field]: value } : tr))
     );
   };
-
-  // Handle price change
-  const handlePriceChange = (idx: number, field: string, value: string) => {
-    setPrices((prev: any) =>
-      prev.map((p: any, i: number) =>
-        i === idx ? { ...p, [field]: value } : p
-      )
-    );
-  };
-
-  // Add/remove price
-  const addPrice = () => setPrices([...prices, { currency: "", value: "" }]);
-  const removePrice = (idx: number) =>
-    setPrices(prices.filter((_: any, i: number) => i !== idx));
 
   // Remove photo (from state, not API)
   const removePhotoFile = (idx: number) =>
@@ -105,22 +90,26 @@ export function ProductFormDialog({
     e.target.value = "";
   };
 
+  // URL orqali rasm qo‘shish handler
+  const handleAddPhotoUrl = () => {
+    if (
+      photoUrlInput.trim() &&
+      photoFiles.length + photoUrls.length < 10 &&
+      !photoUrls.some((p: any) => p.photo_url === photoUrlInput.trim())
+    ) {
+      setPhotoUrls((prev:any) => [...prev, { photo_url: photoUrlInput.trim() }]);
+      setPhotoUrlInput("");
+    }
+  };
+
   // Submit
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setUploading(true);
 
     // --- VALIDATSIYA ---
-    const priceErrors = prices.some(
-      (p: any) =>
-        !p.currency ||
-        !allowedCurrencies.find((c) => c.code === p.currency) ||
-        !p.value ||
-        isNaN(Number(p.value)) ||
-        Number(p.value) <= 0
-    );
-    if (priceErrors) {
-      toast.error("Valyuta va narxlarni to'g'ri kiriting!");
+    if (!coin || isNaN(Number(coin)) || Number(coin) <= 0) {
+      toast.error("Coin qiymatini to'g'ri kiriting!");
       setUploading(false);
       return;
     }
@@ -144,7 +133,6 @@ export function ProductFormDialog({
         const files = photoFiles.map((pf) => pf.file);
         const data = await uploadMultImage(files);
 
-        // uploadMultImage har doim [{ photo_url: "..." }] formatida qaytadi
         const formatted = Array.isArray(data)
           ? data
               .filter(
@@ -166,21 +154,9 @@ export function ProductFormDialog({
     await onSubmit({
       rating: Number(rating),
       rewiev: Number(rewiev),
-      photo_url: uploadedPhotos, // Faqat massiv va har bir elementda faqat photo_url property
+      coin: Number(coin),
+      photo_url: uploadedPhotos,
       translations,
-      prices: prices
-        .filter(
-          (p: any) =>
-            p.currency &&
-            allowedCurrencies.find((c) => c.code === p.currency) &&
-            p.value &&
-            !isNaN(Number(p.value)) &&
-            Number(p.value) > 0
-        )
-        .map((p: any) => ({
-          currency: p.currency,
-          value: Number(p.value),
-        })),
     });
 
     setUploading(false);
@@ -188,33 +164,7 @@ export function ProductFormDialog({
     // Clean up previews
     photoFiles.forEach((pf) => URL.revokeObjectURL(pf.preview));
     setPhotoFiles([]);
-
-    // --- Eski variant (keyinchalik ishlatish uchun) ---
-    /*
-    onSubmit({
-      rating: Number(rating),
-      rewiev: Number(rewiev),
-      photo_url: uploadedPhotos, // filter kerak emas
-      translations,
-      prices: prices
-        .filter((p: any) => p.currency && p.value)
-        .map((p: any) => ({
-          currency: p.currency,
-          value: Number(p.value),
-        })),
-    });
-    */
   };
-
-  // Valyutalar select uchun
-  const allowedCurrencies = [
-    { code: "UZS", name: "UZS (so'm)" },
-    { code: "USD", name: "USD (dollar)" },
-    { code: "RUB", name: "RUB (rubl)" },
-    { code: "KZT", name: "KZT (tenge)" },
-    { code: "KGS", name: "KGS (som)" },
-    { code: "TJS", name: "TJS (somoni)" },
-  ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -237,6 +187,15 @@ export function ProductFormDialog({
               placeholder={t("rewiev") || "Review"}
               value={rewiev}
               onChange={(e) => setRewiev(e.target.value)}
+            />
+            <Input
+              name="coin"
+              type="number"
+              min={1}
+              placeholder={t("coin") || "Coin"}
+              value={coin}
+              onChange={(e) => setCoin(e.target.value)}
+              required
             />
           </div>
 
@@ -290,13 +249,37 @@ export function ProductFormDialog({
               ))}
               {/* Upload input */}
               {photoFiles.length + photoUrls.length < 10 && (
-                <Input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  disabled={uploading}
-                />
+                <div className="flex flex-col gap-2">
+                  <Input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    disabled={uploading}
+                  />
+                  {/* URL orqali rasm qo‘shish */}
+                  <h3 className="text-center">Or</h3>
+                    
+                  <div className="flex gap-1">
+                    <Input
+                      type="url"
+                      placeholder="https://example.com/image.jpg"
+                      value={photoUrlInput}
+                      onChange={(e) => setPhotoUrlInput(e.target.value)}
+                      disabled={uploading}
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleAddPhotoUrl}
+                      disabled={
+                        !photoUrlInput.trim() ||
+                        photoFiles.length + photoUrls.length >= 10
+                      }
+                    >
+                      {t("add") || "Qo'shish"}
+                    </Button>
+                  </div>
+                </div>
               )}
             </div>
             <div className="text-xs text-muted-foreground mt-1">
@@ -371,52 +354,6 @@ export function ProductFormDialog({
               </TabsContent>
             ))}
           </Tabs>
-
-          {/* Prices */}
-          <div>
-            <label className="block mb-1">{t("prices")}</label>
-            {prices.map((price: any, idx: number) => (
-              <div key={idx} className="flex gap-2 mb-2">
-                <select
-                  value={price.currency}
-                  onChange={(e) =>
-                    handlePriceChange(idx, "currency", e.target.value)
-                  }
-                  className="border rounded px-2 py-1"
-                  required
-                >
-                  <option value="">Valyutani tanlang</option>
-                  {allowedCurrencies.map((cur) => (
-                    <option key={cur.code} value={cur.code}>
-                      {cur.name}
-                    </option>
-                  ))}
-                </select>
-                <Input
-                  type="number"
-                  placeholder={t("price")}
-                  value={price.value}
-                  onChange={(e) =>
-                    handlePriceChange(idx, "value", e.target.value)
-                  }
-                  min={1}
-                  required
-                />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => removePrice(idx)}
-                  disabled={prices.length === 1}
-                >
-                  ×
-                </Button>
-              </div>
-            ))}
-            <Button type="button" variant="outline" onClick={addPrice}>
-              {t("add")}
-            </Button>
-          </div>
 
           <Button type="submit" className="w-full" disabled={uploading}>
             {uploading ? t("loading") || "Loading..." : t("save")}

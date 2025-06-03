@@ -73,13 +73,13 @@ export function ProductsTable() {
   if (!data) return <div className="text-center py-10">{t("loading")}</div>;
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm p-4">
+    <div className="overflow-x-auto rounded-lg border  shadow-sm p-4">
       {/* Universal search */}
       <div className="flex flex-wrap gap-2 mb-4">
         <input
           className="border px-2 py-1 rounded"
           placeholder={
-            t("searchUniversal") ||
+            t("search") ||
             "ID, nomi, narxi, reytingi yoki otzivi bo‘yicha qidirish"
           }
           value={search}
@@ -91,8 +91,8 @@ export function ProductsTable() {
       </div>
 
       <table className="min-w-full table-auto text-sm text-left">
-        <thead className="bg-gray-100 text-gray-700">
-          <tr>
+        <thead >
+          <tr className="mb-4">
             <th className="px-4 py-2">{t("id")}</th>
             <th className="px-4 py-2">{t("name")}</th>
             <th className="px-4 py-2">{t("price")}</th>
@@ -101,9 +101,9 @@ export function ProductsTable() {
             <th className="px-4 py-2 text-center">{t("actions")}</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y ">
           {paginatedData.map((product: any) => (
-            <tr key={product.id} className="hover:bg-gray-50">
+            <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
               <td className="px-4 py-2">{product.id}</td>
               <td className="px-4 py-2">
                 {product.translations?.find(
@@ -111,9 +111,8 @@ export function ProductsTable() {
                 )?.name || product.translations?.[0]?.name}
               </td>
               <td className="px-4 py-2">
-                {product.prices
-                  ?.map((p: any) => `${p.value} ${p.currency}`)
-                  .join(", ")}
+                {product?.coin ? product.coin:" - "}
+                  
               </td>
               <td className="px-4 py-2">{product.rating}</td>
               <td className="px-4 py-2">{product.rewiev}</td>

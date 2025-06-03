@@ -31,6 +31,7 @@ const cardTypes = ["click", "uzcard", "humo"];
 const countries = languages;
 const PAGE_SIZE = 10;
 
+  
 export default function CardsSection() {
   const { t } = useLanguage();
   const [cards, setCards] = useState([]);
