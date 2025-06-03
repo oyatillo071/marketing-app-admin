@@ -19,15 +19,6 @@ const languages = [
 	{ code: "tj", name: "Тоҷикӣ" },
 	{ code: "cn", name: "中文" },
 ];
-const allowedCurrencies = [
-	{ code: "UZS", name: "UZS (so'm)" },
-	{ code: "USD", name: "USD (dollar)" },
-	{ code: "EUR", name: "EUR (yuro)" },
-	{ code: "RUB", name: "RUB (rubl)" },
-	{ code: "KZT", name: "KZT (tenge)" },
-	{ code: "KGS", name: "KGS (som)" },
-	{ code: "CNY", name: "CNY (yuan)" },
-];
 
 export function TariffFormDialog({
 	open,
@@ -57,26 +48,25 @@ export function TariffFormDialog({
 		})
 	);
 
-	// Prices state
-	const [prices, setPrices] = useState(
-		allowedCurrencies.map((cur) => {
-			const found = initialData?.prices?.find((p: any) => p.currency === cur.code);
-			return { currency: cur.code, value: found ? String(found.value) : "" };
-		})
-	);
+	// Coin state
+	const [coin, setCoin] = useState(initialData?.coin || "");
 
-	// Photo state
+	// Photo state: file yoki url
 	const [photoFile, setPhotoFile] = useState<{ file: File; preview: string } | null>(null);
 	const [photoUrl, setPhotoUrl] = useState(
 		initialData?.photo_url && typeof initialData.photo_url === "string"
 			? initialData.photo_url
 			: initialData?.photo_url?.[0]?.photo_url || ""
 	);
+	const [photoUrlInput, setPhotoUrlInput] = useState("");
+
+	// Uploading state
 	const [uploading, setUploading] = useState(false);
 
 	// Other fields
 	const [term, setTerm] = useState(initialData?.term || "");
 	const [referralBonus, setReferralBonus] = useState(initialData?.referral_bonus || "");
+	const [dailyProfit, setDailyProfit] = useState(initialData?.dailyProfit || "");
 
 	// Handlers
 	const handleTranslationChange = (lang: string, field: string, value: string) => {
@@ -84,48 +74,22 @@ export function TariffFormDialog({
 			prev.map((tr) => (tr.language === lang ? { ...tr, [field]: value } : tr))
 		);
 	};
-	const handlePriceChange = (idx: number, value: string) => {
-		setPrices((prev) => prev.map((p, i) => (i === idx ? { ...p, value } : p)));
-	};
 	const removePhotoFile = () => setPhotoFile(null);
 	const removePhotoUrl = () => setPhotoUrl("");
 	const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!e.target.files?.length) return;
 		const file = e.target.files[0];
 		setPhotoFile({ file, preview: URL.createObjectURL(file) });
+		setPhotoUrl(""); // file tanlansa url tozalanadi
 		e.target.value = "";
 	};
-
-	// --- KO'P RASM YUKLASH UCHUN KODNI KOMMENTGA OLDIM ---
-	/*
-	const [photoFiles, setPhotoFiles] = useState<{ file: File; preview: string }[]>([]);
-	const [photoUrls, setPhotoUrls] = useState(
-		initialData?.photo_url
-			? Array.isArray(initialData.photo_url)
-				? initialData.photo_url
-				: [{ photo_url: initialData.photo_url }]
-			: []
-	);
-	const removePhotoFile = (idx: number) =>
-		setPhotoFiles(photoFiles.filter((_, i) => i !== idx));
-	const removePhotoUrl = (idx: number) =>
-		setPhotoUrls(photoUrls.filter((_: any, i: number) => i !== idx));
-	const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (!e.target.files?.length) return;
-		const files = Array.from(e.target.files).slice(
-			0,
-			10 - photoFiles.length - photoUrls.length
-		);
-		const newFiles = files.map((file) => ({
-			file,
-			preview: URL.createObjectURL(file),
-		}));
-		setPhotoFiles((prev) =>
-			[...prev, ...newFiles].slice(0, 10 - photoUrls.length)
-		);
-		e.target.value = "";
+	const handleAddPhotoUrl = () => {
+		if (photoUrlInput.trim()) {
+			setPhotoUrl(photoUrlInput.trim());
+			setPhotoFile(null); // url tanlansa file tozalanadi
+			setPhotoUrlInput("");
+		}
 	};
-	*/
 
 	// Submit
 	const handleSubmit = async (e: any) => {
@@ -143,21 +107,13 @@ export function TariffFormDialog({
 			setUploading(false);
 			return;
 		}
-		const priceErrors = prices.some(
-			(p: any) =>
-				!p.currency ||
-				!allowedCurrencies.find((c) => c.code === p.currency) ||
-				!p.value ||
-				isNaN(Number(p.value)) ||
-				Number(p.value) <= 0
-		);
-		if (priceErrors) {
-			toast.error("Valyuta va narxlarni to'g'ri kiriting!");
+		if (!coin || isNaN(Number(coin)) || Number(coin) <= 0) {
+			toast.error("Coin qiymatini to'g'ri kiriting!");
 			setUploading(false);
 			return;
 		}
 		if (!photoFile && !photoUrl) {
-			toast.error("Kamida bitta rasm yuklang!");
+			toast.error("Kamida bitta rasm yuklang yoki url kiriting!");
 			setUploading(false);
 			return;
 		}
@@ -166,7 +122,6 @@ export function TariffFormDialog({
 		if (photoFile) {
 			try {
 				const data = await uploadMultImage([photoFile.file]);
-				// uploadMultImage har doim [{ photo_url: "..." }] formatida qaytadi
 				uploadedPhotoUrl =
 					Array.isArray(data) && data[0]?.photo_url
 						? data[0].photo_url
@@ -181,9 +136,11 @@ export function TariffFormDialog({
 		setUploading(false);
 
 		onSubmit({
-      id: initialData?.id,
+			id: initialData?.id,
 			term: Number(term),
 			referral_bonus: Number(referralBonus),
+			coin: Number(coin),
+			dailyProfit: String(dailyProfit), 
 			photo_url: uploadedPhotoUrl,
 			translations: translations.map((tr) => ({
 				language: tr.language,
@@ -193,12 +150,6 @@ export function TariffFormDialog({
 				features: tr.features,
 				usage: tr.usage,
 			})),
-			prices: prices
-				.filter((p: any) => p.currency && p.value)
-				.map((p: any) => ({
-					currency: p.currency,
-					value: Number(p.value),
-				})),
 		});
 
 		// Clean up preview
@@ -223,12 +174,6 @@ export function TariffFormDialog({
 				};
 			})
 		);
-		setPrices(
-			allowedCurrencies.map((cur) => {
-				const found = initialData?.prices?.find((p: any) => p.currency === cur.code);
-				return { currency: cur.code, value: found ? String(found.value) : "" };
-			})
-		);
 		setPhotoUrl(
 			initialData?.photo_url && typeof initialData.photo_url === "string"
 				? initialData.photo_url
@@ -237,6 +182,8 @@ export function TariffFormDialog({
 		setPhotoFile(null);
 		setTerm(initialData?.term || "");
 		setReferralBonus(initialData?.referral_bonus || "");
+		setCoin(initialData?.coin || "");
+		setDailyProfit(initialData?.dailyProfit || "");
 	}, [initialData, open]);
 
 	return (
@@ -268,13 +215,31 @@ export function TariffFormDialog({
 							onChange={(e) => setReferralBonus(e.target.value)}
 							required
 						/>
+						<Input
+							name="coin"
+							type="number"
+							min={1}
+							placeholder={t("coin") || "Coin"}
+							value={coin}
+							onChange={(e) => setCoin(e.target.value)}
+							required
+						/>
+						<Input
+							name="dailyProfit"
+							type="number"
+							min={0}
+							placeholder={t("dailyProfit") || "Daily profit"}
+							value={dailyProfit}
+							onChange={(e) => setDailyProfit(e.target.value)}
+							required
+						/>
 					</div>
 
 					{/* Photo upload */}
 					<div>
 						<label className="block mb-1">{t("photo")}</label>
 						<div className="flex gap-2 flex-wrap p-4">
-							{/* Existing uploaded image */}
+							{/* Existing uploaded image (URL) */}
 							{photoUrl && (
 								<div className="relative">
 									<Image
@@ -316,14 +281,32 @@ export function TariffFormDialog({
 									</Button>
 								</div>
 							)}
-							{/* Upload input */}
+							{/* Upload input yoki URL input */}
 							{!photoFile && !photoUrl && (
-								<Input
-									type="file"
-									accept="image/*"
-									onChange={handlePhotoUpload}
-									disabled={uploading}
-								/>
+								<div className="flex flex-col gap-2">
+									<Input
+										type="file"
+										accept="image/*"
+										onChange={handlePhotoUpload}
+										disabled={uploading}
+									/>
+									<div className="flex gap-1">
+										<Input
+											type="url"
+											placeholder="https://example.com/image.jpg"
+											value={photoUrlInput}
+											onChange={(e) => setPhotoUrlInput(e.target.value)}
+											disabled={uploading}
+										/>
+										<Button
+											type="button"
+											onClick={handleAddPhotoUrl}
+											disabled={!photoUrlInput.trim()}
+										>
+											{t("add") || "Qo'shish"}
+										</Button>
+									</div>
+								</div>
 							)}
 						</div>
 						<div className="text-xs text-muted-foreground mt-1">
@@ -387,26 +370,6 @@ export function TariffFormDialog({
 							</TabsContent>
 						))}
 					</Tabs>
-
-					{/* Prices */}
-					<div>
-						<label className="block mb-1">{t("prices")}</label>
-						<div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-							{prices.map((price: any, idx: number) => (
-								<div key={price.currency} className="flex gap-2 mb-2">
-									<Input
-										placeholder={t("price") + " " + price.currency}
-										value={price.value}
-										type="number"
-										onChange={(e) => handlePriceChange(idx, e.target.value)}
-										min={1}
-										required
-									/>
-									<span className="self-center">{price.currency}</span>
-								</div>
-							))}
-						</div>
-					</div>
 
 					<Button type="submit" className="w-full" disabled={uploading}>
 						{uploading ? t("loading") || "Loading..." : t("save")}

@@ -89,21 +89,23 @@ export function TariffsTable() {
         tariff.translations?.[0] ||
         {};
 
-      // Get price for preferred currency or default to first price
+      // Coin orqali narx
       const price =
-        tariff.prices?.find((p: any) => p.currency === preferredCurrency) ||
-        tariff.prices?.[0];
+        typeof tariff.coin === "number" && !isNaN(tariff.coin)
+          ? `${tariff.coin} coin`
+          : "-";
 
       return {
         id: tariff.id,
         name: translation.name || "null",
         description: translation.description || "-",
-        price: price ? `${price.value} ${price.currency}` : "-",
+        price, // <-- coin orqali narx
         status: tariff.status || "Faol",
         term: tariff.term,
         referral_bonus: tariff.referral_bonus,
         createdAt: tariff.createdAt,
         photo_url: tariff.photo_url,
+        dailyProfit: tariff.dailyProfit,
         // Store the full object for details view
         _original: tariff,
       };

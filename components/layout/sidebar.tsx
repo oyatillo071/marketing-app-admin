@@ -184,6 +184,11 @@ export function Sidebar() {
       ],
     },
     {
+      title: t("tariffs"),
+      href: "/dashboard/tariffs",
+      icon: Wallet,
+    },
+    {
       title: t("withdrawals"),
       href: "/dashboard/withdrawals",
       icon: Wallet,

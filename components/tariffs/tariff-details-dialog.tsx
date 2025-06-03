@@ -49,10 +49,9 @@ export function TariffDetailsDialog({
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-4">
+          <TabsList className="grid grid-cols-2 mb-4">
             <TabsTrigger value="details">{t("details")}</TabsTrigger>
             <TabsTrigger value="translations">{t("translations")}</TabsTrigger>
-            <TabsTrigger value="prices">{t("prices")}</TabsTrigger>
           </TabsList>
 
           <ScrollArea className="h-[60vh]">
@@ -76,6 +75,22 @@ export function TariffDetailsDialog({
                     <div className="flex justify-between">
                       <span className="font-medium">{t("referralBonus")}:</span>
                       <span>{tariff.referral_bonus}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">{t("dailyProfit")}:</span>
+                      <span>
+                        {tariff.dailyProfit !== undefined && tariff.dailyProfit !== null
+                          ? tariff.dailyProfit
+                          : "-"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">{t("coin")}:</span>
+                      <span>
+                        {tariff.coin !== undefined && tariff.coin !== null
+                          ? `${tariff.coin} coin`
+                          : "-"}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="font-medium">{t("status")}:</span>
@@ -168,64 +183,6 @@ export function TariffDetailsDialog({
                   </Card>
                 );
               })}
-            </TabsContent>
-
-            <TabsContent value="prices" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t("allPrices")}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {(() => {
-                      // Language to preferred currency order
-                      const languageToCurrencyOrder: Record<string, string[]> =
-                        {
-                          uz: ["UZS", "USD", "EUR", "RUB", "KZT", "KGS", "CNY"],
-                          ru: ["RUB", "USD", "EUR", "UZS", "KZT", "KGS", "CNY"],
-                          en: ["USD", "EUR", "UZS", "RUB", "KZT", "KGS", "CNY"],
-                          kz: ["KZT", "USD", "RUB", "UZS", "EUR", "KGS", "CNY"],
-                          kg: ["KGS", "USD", "RUB", "KZT", "UZS", "EUR", "CNY"],
-                          tj: ["TJS", "USD", "RUB", "UZS", "KZT", "KGS", "CNY"],
-                          cn: ["CNY", "USD", "EUR", "RUB", "UZS", "KZT", "KGS"],
-                        };
-
-                      // Get preferred currency order for the current language or use default
-                      const currencyOrder = languageToCurrencyOrder[
-                        language
-                      ] || ["UZS", "USD", "EUR", "RUB", "KZT", "KGS", "CNY"];
-
-                      // Create a sorted list of currencies
-                      const sortedCurrencies = [...currencies].sort((a, b) => {
-                        const aIndex = currencyOrder.indexOf(a);
-                        const bIndex = currencyOrder.indexOf(b);
-                        return aIndex - bIndex;
-                      });
-
-                      return sortedCurrencies.map((currency) => {
-                        const price = tariff.prices?.find(
-                          (p: any) => p.currency === currency
-                        );
-
-                        return (
-                          <Card key={currency} className="border shadow-sm">
-                            <CardHeader className="p-3">
-                              <CardTitle className="text-lg">
-                                {currency}
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-3 pt-0">
-                              <span className="text-2xl font-bold">
-                                {price ? price.value.toLocaleString() : "-"}
-                              </span>
-                            </CardContent>
-                          </Card>
-                        );
-                      });
-                    })()}
-                  </div>
-                </CardContent>
-              </Card>
             </TabsContent>
           </ScrollArea>
         </Tabs>
