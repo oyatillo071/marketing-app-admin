@@ -1,6 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useLanguage } from "@/contexts/language-context";
 import { usePayments } from "@/hooks/use-payments";
+import { fetchPaymentsByStatus, paymentsChekedFn, rejectPayments } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,21 +23,50 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Download, EyeIcon, Loader2, Search } from "lucide-react";
-import { useState } from "react";
 import { exportToPDF } from "@/lib/pdf-export";
-import { useLanguage } from "@/contexts/language-context";
 import Link from "next/link";
 import Image from "next/image";
 import { ZoomedImageDialog } from "@/components/ZoomedImageDialog";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function PaymentsPage() {
   const { t } = useLanguage();
-  const { data: payments = [], isLoading } = usePayments();
+  const [statusFilter, setStatusFilter] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [zoomedImage, setZoomedImage] = useState(null);
+  const [payments, setPayments] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRejectOpen, setIsRejectOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectPaymentId, setRejectPaymentId] = useState(null);
+  const queryClient = useQueryClient();
 
+  // Faqat komponent tanasida hook chaqiring!
+  const { data: allPayments = [], isLoading: isAllLoading } = usePayments();
+
+  // Status bo‘yicha filter
+  useEffect(() => {
+    const loadPayments = async () => {
+      setIsLoading(true);
+      let data = [];
+      if (statusFilter) {
+        data = await fetchPaymentsByStatus(statusFilter);
+      } else {
+        data = allPayments;
+      }
+      setPayments(data);
+      setIsLoading(false);
+    };
+    loadPayments();
+  }, [statusFilter, allPayments]);
+
+  useEffect(() => {
+    if (!statusFilter) setPayments(allPayments);
+  }, [allPayments, statusFilter]);
+
+  // Search filter (frontda)
   const filteredPayments = payments.filter(
     (payment) =>
       payment.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -56,6 +88,43 @@ export default function PaymentsPage() {
   const openDetailsDialog = (payment) => {
     setSelectedPayment(payment);
     setIsDialogOpen(true);
+  };
+
+  // Cheked qilish funksiyasi
+  const handleCheckPayment = async (payment) => {
+    const res = await paymentsChekedFn({
+      currency: payment.currency,
+      how_much: payment.how_much,
+      coin: typeof payment.coin === "number" && !isNaN(payment.coin) ? payment.coin : 0,
+      id: payment.id,
+    });
+    // Lokal state yangilash (ixtiyoriy)
+    setPayments((prev) =>
+      prev.map((p) =>
+        p.id === payment.id
+          ? { ...p, ...res }
+          : p
+      )
+    );
+    // Query-ni invalidate qilib, yangi ma’lumotlarni olish
+    queryClient.invalidateQueries({ queryKey: ["payments"] });
+  };
+
+  // Reject tugmasini bosganda modalni ochish
+  const openRejectDialog = (payment) => {
+    setRejectPaymentId(payment.id);
+    setRejectReason("");
+    setIsRejectOpen(true);
+  };
+
+  // Rejectni yuborish
+  const handleReject = async () => {
+    if (!rejectReason.trim()) return;
+    await rejectPayments(rejectPaymentId, rejectReason);
+    setPayments((prev) => prev.filter((p) => p.id !== rejectPaymentId));
+    setIsRejectOpen(false);
+    // Query-ni invalidate qilib, yangi ma’lumotlarni olish
+    queryClient.invalidateQueries({ queryKey: ["payments"] });
   };
 
   return (
@@ -92,6 +161,17 @@ export default function PaymentsPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        {/* Status filter */}
+        <select
+          className="border rounded px-2 py-1"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="">{t("all")}</option>
+          <option value="sending">{t("sending")}</option>
+          <option value="confirmed">{t("confirmed")}</option>
+          <option value="cancelled">{t("cancelled")}</option>
+        </select>
       </div>
 
       {isLoading ? (
@@ -146,7 +226,7 @@ export default function PaymentsPage() {
                         ? new Date(payment.to_send_date).toLocaleString()
                         : "-"}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="flex items-center">
                       <Button
                         variant="outline"
                         size="sm"
@@ -154,6 +234,26 @@ export default function PaymentsPage() {
                       >
                         <EyeIcon />
                       </Button>
+                      {payment.status == "SENDING" && (
+                        <>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="ml-2"
+                            onClick={() => handleCheckPayment(payment)}
+                          >
+                            {t("check")}
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="ml-2"
+                            onClick={() => openRejectDialog(payment)}
+                          >
+                            {t("reject")}
+                          </Button>
+                        </>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
@@ -261,6 +361,38 @@ export default function PaymentsPage() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Modal */}
+      <Dialog open={isRejectOpen} onOpenChange={setIsRejectOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("rejectPayment")}</DialogTitle>
+          </DialogHeader>
+          <div>
+            <p>
+              <strong>ID:</strong> {rejectPaymentId}
+            </p>
+            <Input
+              placeholder={t("reason")}
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              className="mt-2"
+            />
+            <div className="flex justify-end gap-2 mt-4">
+              <Button variant="outline" onClick={() => setIsRejectOpen(false)}>
+                {t("cancel")}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleReject}
+                disabled={!rejectReason.trim()}
+              >
+                {t("reject")}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

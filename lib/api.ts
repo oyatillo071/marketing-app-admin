@@ -162,23 +162,37 @@ export async function fetchPaymentsByStatus(status: string) {
   const { data } = await api(`/payments/status/${status}`);
   return data;
 }
-// Check payment status and reason
-export async function checkPayment({
+export async function paymentsChekedFn({
+  currency,
+  how_much,
+  coin,
   id,
-  status,
-  reason,
-}: {
-  id: string | number;
-  status: string;
-  reason?: string;
-}) {
-  const { data } = await axios.post(`/payments/checked`, {
+}: { currency: string; how_much: number; coin: number; id: number }) {
+  const { data } = await api.post(`/payments/checked`, {
+    currency,
+    how_much,
+    coin,
     id,
-    status,
-    reason,
   });
   return data;
 }
+// // Check payment status and reason
+// export async function checkPayment({
+//   id,
+//   status,
+//   reason,
+// }: {
+//   id: string | number;
+//   status: string;
+//   reason?: string;
+// }) {
+//   const { data } = await axios.post(`/payments/checked`, {
+//     id,
+//     status,
+//     reason,
+//   });
+//   return data;
+// }
 // Withdrawals
 export const fetchWithdrawals = async () => {
   const response = await api.get("/payments");
@@ -198,27 +212,12 @@ export async function processWithdrawalWithAdmin(
 }
 
 export const processWithdrawal = async (id: string) => {
-  if (useMockData()) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return { id, status: "To'langan", processedAt: new Date().toISOString() };
-  }
-
   const response = await api.post(`/payments/${id}/process`);
   return response.data;
 };
 
-export const rejectWithdrawal = async (id: string, reason: string) => {
-  if (useMockData()) {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return {
-      id,
-      status: "Rad etilgan",
-      rejectedAt: new Date().toISOString(),
-      reason,
-    };
-  }
-
-  const response = await api.post(`/payments/${id}/reject`, { reason });
+export const rejectPayments = async (id: string|number, reason: string) => {
+  const response = await api.post(`/payments/rejected`, { id,reason });
   return response.data;
 };
 
