@@ -101,7 +101,7 @@ export default function CardsSection() {
       if (!validate()) return;
       await addCard({
         card_seria_number: String(form.card_seria_number.replace(/\s/g, "")),
-        country: String(form.cauntries || form.custom_country),
+        countries: String(form.cauntries || form.custom_country), // <-- countries
         card_type: String(form.card_type || form.custom_type),
       });
       setForm({
