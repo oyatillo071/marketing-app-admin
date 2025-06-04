@@ -369,7 +369,7 @@ export const uploadImage = async (file: File) => {
   formData.append("file", file);
 
   // api.upload orqali POST so‘rov yuboriladi
-  const res = await api.post("/upload", formData, {
+  const res = await api.post("/upload/single", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
